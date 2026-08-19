@@ -11,3 +11,5 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## MCPs
 
 - Playwright screenshots y cualquier cosa relacionada a Playwright tienen que estar en la carpeta .playwright-mcp
+
+- Context7 con este MCP se obtiene la documentación actualizada de un framework
