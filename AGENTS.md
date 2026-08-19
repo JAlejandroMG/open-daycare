@@ -8,8 +8,33 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+## Stack
+
+- Next.js 16.3.1 (App Router) + React 19 + Tailwind CSS 4. Tailwind is configured only through `@tailwindcss/postcss` and the CSS `@theme` in `app/globals.css` — there is no `tailwind.config`.
+- Path alias `@/*` → repo root (see `tsconfig.json`).
+- `app/` currently contains only the create-next-app bootstrap; the real app has not been built yet.
+
+## Commands
+
+- `npm run dev` — dev server. Re-adds the auto-generated block at the top of this file on start; don't fight it.
+- `npm run lint` — ESLint. There is **no test script and no typecheck script** in `package.json`.
+- `npx tsc --noEmit` — standalone typecheck (TS is `strict`).
+- `npm run build` — production build; also surfaces TS/type errors.
+
+## Design source of truth
+
+- `references/pantallas/*.dc.html` are the design mockups (DesignCompose-runtime HTML; they render the UI live in a browser). `references/screenshots/*.png` are static previews of the same screens. Build the UI to match these files — not to your own idea of the app.
+- Brand: **OpenDayCare**. Fonts: Fredoka (headings) + Nunito (body). Warm palette (bg `#FBF4EC`, accent coral `#F6A98E`/`#EC7E62`).
+- All UI copy is in **Spanish (Rioplatense)** — voseo forms like "Ingresá", "Publicá", "Guardá".
+
+## Workflow: spec-driven development
+
+- `.agents/skills/` provides the `/spec` and `/spec-impl` commands (installed from `klerith/fernando-skills`, pinned in `skills-lock.json`).
+- Large features start with `/spec`, which writes `specs/NN-slug.md` (folder is created on first use). Specs and answers must match the conversation's language (repo default: Spanish).
+- `/spec-impl NN-slug` only runs specs whose state means "Approved"; it works on a `spec-NN-slug` branch, pauses after each plan step for diff review, and never auto-commits.
+- `CLAUDE.md` only imports `@AGENTS.md` — this file is the single source of agent instructions.
+
 ## MCPs
 
-- Playwright screenshots y cualquier cosa relacionada a Playwright tienen que estar en la carpeta .playwright-mcp
-
-- Context7 con este MCP se obtiene la documentación actualizada de un framework
+- Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and anything Playwright-related must live in `.playwright-mcp/` (gitignored).
+- Context7: use it to fetch up-to-date framework documentation.
