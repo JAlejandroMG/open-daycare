@@ -45,7 +45,7 @@ export const posts: Post[] = [
     id: "post-3",
     type: "announcement",
     childName: "Anuncio general",
-    childInitial: "",
+    childInitial: "A",
     avatarBackgroundColor: "bg-[#CCD8F4]",
     avatarTextColor: "text-[#4E72C8]",
     publishedAt: "07:50",
