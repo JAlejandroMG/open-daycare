@@ -38,3 +38,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and anything Playwright-related must live in `.playwright-mcp/` (gitignored).
 - Context7: use it to fetch up-to-date framework documentation.
+
+## Code rules
+- Follow Clean Code principles.
+- Function and variable names in english.
