@@ -127,6 +127,8 @@ Mock data se define en `lib/_data/mock-data.ts`. `POST_TYPE_CONFIG` se exporta d
 
 16. **Ejecutar `npm run lint` y `npx tsc --noEmit`** para verificar que no hay errores.
 
+17. **Bonus: sidebar móvil con drawer** — Extraer el contenido de `Sidebar` a `SidebarContent` (logo, botón, nav, perfil; sin estado). Crear `SidebarDrawer` (`"use client"`): botón hamburguesa visible solo en mobile (`lg:hidden`) que abre un overlay con backdrop, panel izquierdo que reutiliza `SidebarContent`, botón de cerrar, scroll lock y animación de entrada. Agregar `SidebarDrawer` en `app/page.tsx`.
+
 ---
 
 ## Acceptance criteria
@@ -145,6 +147,8 @@ Mock data se define en `lib/_data/mock-data.ts`. `POST_TYPE_CONFIG` se exporta d
 - [ ] La paleta de colores coincide con el diseño (fondo cálido, acentos coral/verde/celeste/azul).
 - [ ] `npm run lint` pasa sin errores.
 - [ ] `npx tsc --noEmit` pasa sin errores.
+- [ ] En mobile (< `lg`) hay un botón hamburguesa a la izquierda que abre un drawer overlay reutilizando el contenido del sidebar.
+- [ ] El drawer se cierra tocando el backdrop o el botón de cerrar.
 
 ---
 
