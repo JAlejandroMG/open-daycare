@@ -1,26 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6ecdf;
+  --foreground: #3f362e;
+  --sidebar: #fffdf9;
+  --border-soft: #ece0d0;
+  --border-divider: #f0e6d8;
+  --text-muted: #a89a8b;
+  --text-secondary: #94887b;
+  --text-body: #4a4038;
+  --coral-50: #fbe3d8;
+  --coral-100: #f8c3a8;
+  --coral-300: #f4977e;
+  --coral-400: #f2937a;
+  --coral-500: #ee8164;
+  --coral-600: #e0654a;
+  --coral-700: #d9583c;
+  --coral-800: #c5503a;
+  --badge-green: #cfe8d8;
+  --badge-green-text: #3e9b6c;
+  --badge-sky: #c7e7f1;
+  --badge-sky-text: #2e89a6;
+  --badge-blue: #ccd8f4;
+  --badge-blue-text: #4e72c8;
+  --avatar-soft: #a9d9e8;
+  --avatar-soft-text: #1f7a93;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-sidebar: var(--sidebar);
+  --color-border-soft: var(--border-soft);
+  --color-border-divider: var(--border-divider);
+  --color-text-muted: var(--text-muted);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-body: var(--text-body);
+  --color-coral-50: var(--coral-50);
+  --color-coral-100: var(--coral-100);
+  --color-coral-300: var(--coral-300);
+  --color-coral-400: var(--coral-400);
+  --color-coral-500: var(--coral-500);
+  --color-coral-600: var(--coral-600);
+  --color-coral-700: var(--coral-700);
+  --color-coral-800: var(--coral-800);
+  --color-badge-green: var(--badge-green);
+  --color-badge-green-text: var(--badge-green-text);
+  --color-badge-sky: var(--badge-sky);
+  --color-badge-sky-text: var(--badge-sky-text);
+  --color-badge-blue: var(--badge-blue);
+  --color-badge-blue-text: var(--badge-blue-text);
+  --color-avatar-soft: var(--avatar-soft);
+  --color-avatar-soft-text: var(--avatar-soft-text);
+  --font-sans: var(--font-nunito);
+  --font-heading: var(--font-fredoka);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-nunito), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
