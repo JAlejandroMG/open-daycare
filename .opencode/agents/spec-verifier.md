@@ -1,6 +1,6 @@
 ---
 description: Verifica criterios de aceptación de specs. Usa Context7 para validar recomendaciones de Next.js y Playwright para verificar pantallas con comparación visual.
-mode: primary
+mode: all
 model: opencode-go/qwen3.6-plus
 permission:
   read: allow
