@@ -36,7 +36,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## MCPs
 
-- Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and anything Playwright-related must live in `.playwright-mcp/` (gitignored).
+- Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and any document Playwright-related must live in `.playwright-mcp/` (gitignored).
 - Context7: use it to fetch up-to-date framework documentation.
 
 ## Code rules
