@@ -32,7 +32,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `.agents/skills/` provides the `/spec` and `/spec-impl` commands (installed from `klerith/fernando-skills`, pinned in `skills-lock.json`).
 - Large features start with `/spec`, which writes `specs/NN-slug.md` (folder is created on first use). Specs and answers must match the conversation's language (repo default: Spanish).
 - `/spec-impl NN-slug` only runs specs whose state means "Approved"; it works on a `spec-NN-slug` branch, pauses after each plan step for diff review, and never auto-commits.
+- `/verify-spec NN-slug` verifies acceptance criteria of a spec using Context7 (for Next.js patterns) and Playwright (for visual comparison). Runs via the `spec-verifier` agent defined in `.opencode/agents/spec-verifier.md`.
 - `CLAUDE.md` only imports `@AGENTS.md` — this file is the single source of agent instructions.
+
+## Agents
+
+- `spec-verifier` (`.opencode/agents/spec-verifier.md`): verifies acceptance criteria of specs. Uses Context7 + Playwright for visual comparison. Invoked via `/verify-spec`.
 
 ## MCPs
 

@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenDayCare
+
+Plataforma de gestión de guarderías construida con Next.js 16.3.1, React 19 y Tailwind CSS 4.
+
+## Stack
+
+- **Framework:** Next.js 16.3.1 (App Router)
+- **UI:** React 19 + Tailwind CSS 4
+- **Fonts:** Fredoka (headings) + Nunito (body)
+- **Brand:** OpenDayCare — paleta cálida (bg `#FBF4EC`, accent coral `#F6A98E`/`#EC7E62`)
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Descripción |
+|---------|-------------|
+| `npm run dev` | Dev server |
+| `npm run lint` | ESLint |
+| `npx tsc --noEmit` | Type check (TS strict) |
+| `npm run build` | Build producción |
 
-## Learn More
+## Workflow: Spec-Driven Development
 
-To learn more about Next.js, take a look at the following resources:
+Las features grandes se desarrollan siguiendo el flujo de specs:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **`/spec <descripción>`** — Diseña el spec guardándolo en `specs/NN-slug.md`
+2. **`/spec-impl <NN-slug>`** — Implementa un spec aprobado paso a paso
+3. **`/verify-spec <NN-slug>`** — Verifica criterios de aceptación con Context7 y Playwright
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Los specs viven en `specs/` y siguen la plantilla de `.agents/skills/spec/template.md`.
 
-## Deploy on Vercel
+## Estructura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+app/                  # App Router pages
+components/           # Componentes React
+lib/                  # Utilidades y helpers
+references/           # Mockups de diseño (HTML + screenshots)
+specs/                # Specs de features
+.agents/skills/       # Skills de agente (spec, spec-impl)
+.opencode/agents/     # Agentes (spec-verifier)
+.opencode/commands/   # Comandos (/verify-spec)
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Diseño
+
+Los mockups en `references/pantallas/*.dc.html` y `references/screenshots/*.png` son la fuente de verdad del UI. Copia en **español rioplatense** con voseo ("Ingresá", "Publicá", "Guardá").
