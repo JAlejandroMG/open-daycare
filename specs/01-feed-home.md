@@ -1,6 +1,6 @@
 # SPEC 01 — Implementar home/feed según diseño
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** —
 > **Date:** 2026-08-19
 > **Objective:** Implementar la pantalla principal (home/feed) replicando fielmente el diseño de `references/pantallas/feed.dc.html`, con sidebar, publicaciones mock y responsive básico.
@@ -133,22 +133,22 @@ Mock data se define en `lib/_data/mock-data.ts`. `POST_TYPE_CONFIG` se exporta d
 
 ## Acceptance criteria
 
-- [ ] La pantalla muestra el layout de dos columnas en desktop (sidebar + feed).
-- [ ] La sidebar contiene: logo "OpenDayCare · Sala Soles", botón "Nueva publicación", links de navegación (Feed activo, Niños, Avisos, Mi cuenta), perfil del usuario y botón de logout.
-- [ ] El feed muestra 3 publicaciones (logro, actividad, anuncio) con los datos del mock.
-- [ ] Cada publicación tiene: avatar con inicial, nombre del niño, hora, badge de tipo con color correspondiente, destinatario, texto, likes y comentarios (solo contador), botón Editar (visual).
-- [ ] La publicación de tipo Actividad muestra el placeholder de foto con borde punteado.
-- [ ] Los separadores de fecha aparecen entre grupos de publicaciones del mismo día.
-- [ ] `PostTypeBadge` obtiene label y colores exclusivamente de `POST_TYPE_CONFIG` (sin strings mágicos en componentes).
-- [ ] `PostCard` delega el renderizado en `PostHeader`, `PostBody` y `PostActions`, cada uno con responsabilidad única.
-- [ ] El saludo del header muestra "Buenas, Caro" con la info de sala.
-- [ ] En mobile la sidebar se oculta y solo se ve el feed.
-- [ ] Las fuentes Fredoka y Nunito se cargan correctamente.
-- [ ] La paleta de colores coincide con el diseño (fondo cálido, acentos coral/verde/celeste/azul).
-- [ ] `npm run lint` pasa sin errores.
-- [ ] `npx tsc --noEmit` pasa sin errores.
-- [ ] En mobile (< `lg`) hay un botón hamburguesa a la izquierda que abre un drawer overlay reutilizando el contenido del sidebar.
-- [ ] El drawer se cierra tocando el backdrop o el botón de cerrar.
+- [x] La pantalla muestra el layout de dos columnas en desktop (sidebar + feed).
+- [x] La sidebar contiene: logo "OpenDayCare · Sala Soles", botón "Nueva publicación", links de navegación (Feed activo, Niños, Avisos, Mi cuenta), perfil del usuario y botón de logout.
+- [x] El feed muestra 3 publicaciones (logro, actividad, anuncio) con los datos del mock.
+- [x] Cada publicación tiene: avatar con inicial, nombre del niño, hora, badge de tipo con color correspondiente, destinatario, texto, likes y comentarios (solo contador), botón Editar (visual).
+- [x] La publicación de tipo Actividad muestra el placeholder de foto con borde punteado.
+- [x] Los separadores de fecha aparecen entre grupos de publicaciones del mismo día.
+- [x] `PostTypeBadge` obtiene label y colores exclusivamente de `POST_TYPE_CONFIG` (sin strings mágicos en componentes).
+- [x] `PostCard` delega el renderizado en `PostHeader`, `PostBody` y `PostActions`, cada uno con responsabilidad única.
+- [x] El saludo del header muestra "Buenas, Caro" con la info de sala.
+- [x] En mobile la sidebar se oculta y solo se ve el feed.
+- [x] Las fuentes Fredoka y Nunito se cargan correctamente.
+- [x] La paleta de colores coincide con el diseño (fondo cálido, acentos coral/verde/celeste/azul).
+- [x] `npm run lint` pasa sin errores.
+- [x] `npx tsc --noEmit` pasa sin errores.
+- [x] En mobile (< `lg`) hay un botón hamburguesa a la izquierda que abre un drawer overlay reutilizando el contenido del sidebar.
+- [x] El drawer se cierra tocando el backdrop o el botón de cerrar.
 
 ---
 
