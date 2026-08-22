@@ -3,11 +3,7 @@
 import { useEffect, useState } from "react";
 import { SidebarContent } from "./SidebarContent";
 
-type SidebarDrawerProps = {
-  activeItem: string;
-};
-
-export function SidebarDrawer({ activeItem }: SidebarDrawerProps) {
+export function SidebarDrawer() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -69,7 +65,7 @@ export function SidebarDrawer({ activeItem }: SidebarDrawerProps) {
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
-            <SidebarContent activeItem={activeItem} />
+            <SidebarContent />
           </aside>
         </div>
       ) : null}
