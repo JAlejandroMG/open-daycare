@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Next.js 16.3.1 (App Router) + React 19 + Tailwind CSS 4. Tailwind is configured only through `@tailwindcss/postcss` and the CSS `@theme` in `app/globals.css` — there is no `tailwind.config`.
 - Path alias `@/*` → repo root (see `tsconfig.json`).
-- `app/` currently contains only the create-next-app bootstrap; the real app has not been built yet.
+- `app/` contains the App Router structure with `(dashboard)` route group.
 
 ## Commands
 

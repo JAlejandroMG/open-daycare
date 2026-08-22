@@ -1,6 +1,6 @@
 # SPEC 02 — Implementar páginas de niños (/kids) y perfil de niño (/kids/[id])
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-08-21
 > **Objective:** Implementar las pantallas de lista de niños (`/kids`) y perfil de niño (`/kids/[id]`) replicando fielmente los diseños de `references/pantallas/ninos.dc.html` y `references/pantallas/perfil-nino.dc.html`, con sidebar compartida, datos mock y descomposición en componentes.
