@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { currentUser } from "@/lib/_data/mock-data";
 
 type IconProps = { className?: string };
@@ -84,20 +88,23 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "Feed", href: "#", Icon: HomeIcon },
-  { label: "Niños", href: "#", Icon: KidsIcon },
-  { label: "Avisos", href: "#", Icon: BellIcon },
-  { label: "Mi cuenta", href: "#", Icon: AccountIcon },
+  { label: "Feed", href: "/", Icon: HomeIcon },
+  { label: "Niños", href: "/kids", Icon: KidsIcon },
+  { label: "Avisos", href: "/avisos", Icon: BellIcon },
+  { label: "Mi cuenta", href: "/mi-cuenta", Icon: AccountIcon },
 ];
 
-type SidebarContentProps = {
-  activeItem: string;
-};
+export function SidebarContent() {
+  const pathname = usePathname();
 
-export function SidebarContent({ activeItem }: SidebarContentProps) {
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
   return (
     <>
-      <a href="#" className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
+      <Link href="/" className="flex items-center gap-[11px] px-2 pb-[22px] pt-1">
         <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-[12px] bg-gradient-to-br from-[#F8C3A8] to-[#F2937A]">
           <svg
             width="21"
@@ -121,10 +128,10 @@ export function SidebarContent({ activeItem }: SidebarContentProps) {
             {currentUser.room}
           </span>
         </span>
-      </a>
+      </Link>
 
       <a
-        href="#"
+        href="/crear-publicacion"
         className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-3 py-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.75)]"
       >
         <svg
@@ -144,13 +151,13 @@ export function SidebarContent({ activeItem }: SidebarContentProps) {
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ label, href, Icon }) => {
-          const isActive = label === activeItem;
+          const active = isActive(href);
           return (
             <a
               key={label}
               href={href}
               className={`flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${
-                isActive
+                active
                   ? "bg-[#FBE3D8] font-extrabold text-[#D9583C]"
                   : "font-semibold text-[#6E6359]"
               }`}
@@ -176,7 +183,7 @@ export function SidebarContent({ activeItem }: SidebarContentProps) {
             </span>
           </span>
           <a
-            href="#"
+            href="/login"
             title="Cerrar sesión"
             className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]"
           >
