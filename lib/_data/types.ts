@@ -23,3 +23,28 @@ export type CurrentUser = {
   room: string;
   initial: string;
 };
+
+export type Parent = {
+  id: string;
+  name: string;
+  initial: string;
+  relation: string;
+  status: "active" | "pending";
+  avatarBackgroundColor: string;
+};
+
+export type Kid = {
+  id: string;
+  name: string;
+  initial: string;
+  age: string;
+  room: string;
+  birthDate: string;
+  admissionDate: string;
+  linkedParents: number;
+  allergy?: string;
+  allergyNote?: string;
+  parents: Parent[];
+  avatarBackgroundColor: string;
+  avatarTextColor: string;
+};
