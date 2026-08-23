@@ -154,7 +154,7 @@ export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
           {!errors.fullName && <div className="mb-[18px]" />}
 
           {/* Fecha de nacimiento + Sala */}
-          <div className="mb-[18px] flex gap-[14px]">
+          <div className="mb-[18px] flex flex-col gap-[14px] sm:flex-row">
             <div className="flex-1">
               <label className="mb-2 block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
                 FECHA DE NACIMIENTO
