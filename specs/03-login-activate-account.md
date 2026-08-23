@@ -1,6 +1,6 @@
 # SPEC 03 — Implementar pantallas de login y activar cuenta
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** —
 > **Date:** 2026-08-22
 > **Objective:** Implementar las páginas `/login` y `/activate-account` replicando fielmente los diseños de `references/pantallas/login.dc.html` y `references/pantallas/activar-cuenta.dc.html`, con inputs editables hardcodeados, navegación entre ellas y responsive, sin lógica de autenticación.
@@ -37,9 +37,9 @@ This feature introduces no new data structures. It uses hardcoded placeholder va
 
 ## Implementation plan
 
-1. **Crear `app/login/page.tsx`** — layout de dos columnas en desktop: panel lateral izquierdo con gradiente coral, círculos decorativos, logo OpenDayCare, frase y nombre de guardería; panel derecho con formulario centrado (título, subtítulo, input email con valor hardcodeado, input contraseña con placeholder, link "¿Olvidaste tu contraseña?", botón "Iniciar sesión", link a `/activate-account`). En mobile (`< lg`), el panel lateral se oculta con `hidden lg:flex` y el formulario ocupa todo el viewport centrado.
+1. **Crear `app/(auth)/login/page.tsx`** — layout de dos columnas en desktop: panel lateral izquierdo con gradiente coral, círculos decorativos, logo OpenDayCare, frase y nombre de guardería; panel derecho con formulario centrado (título, subtítulo, input email con valor hardcodeado, input contraseña con placeholder, link "¿Olvidaste tu contraseña?", botón "Iniciar sesión", link a `/activate-account`). En mobile (`< lg`), el panel lateral se oculta con `hidden lg:flex` y el formulario ocupa todo el viewport centrado.
 
-2. **Crear `app/activate-account/page.tsx`** — contenedor centrado vertical y horizontalmente, fondo `#FBF4EC`, ancho máximo ~440px. Incluye: logo/icono gradiente, título, subtítulo, card blanca con avatar del niño y sala, input código de invitación con valor hardcodeado, input email con valor hardcodeado, input contraseña con valor hardcodeado, label-checkbox de autorización (estilo hardcodeado como en el mock), botón "Activar mi cuenta", link a `/login`. Todos los inputs son editables.
+2. **Crear `app/(auth)/activate-account/page.tsx`** — contenedor centrado vertical y horizontalmente, fondo `#FBF4EC`, ancho máximo ~440px. Incluye: logo/icono gradiente, título, subtítulo, card blanca con avatar del niño y sala, input código de invitación con valor hardcodeado, input email con valor hardcodeado, input contraseña con valor hardcodeado, label-checkbox de autorización (estilo hardcodeado como en el mock), botón "Activar mi cuenta", link a `/login`. Todos los inputs son editables.
 
 3. **Verificar navegación** — los links "Activá tu cuenta" (desde login) e "Iniciar sesión" (desde activar cuenta) usan `<Link href="/...">` de Next.js.
 
@@ -70,6 +70,7 @@ This feature introduces no new data structures. It uses hardcoded placeholder va
 - **Sí:** Inputs editables con valores iniciales hardcodeados (placeholders) para simular datos sin lógica de estado.
 - **Sí:** Sin componente de selección "Personal / Familia" en login — solo diseño estático como se pidió.
 - **Sí:** Sin layout compartido `(dashboard)` — estas páginas son públicas y no llevan sidebar.
+- **Sí:** Agrupadas en `app/(auth)/` para organizar las rutas públicas de autenticación (no afecta las URLs).
 - **No:** No se implementa lógica de autenticación ni manejo de formularios (sin `onSubmit`, sin validación).
 - **No:** No se usa `next/image` porque no hay imágenes reales, solo íconos SVG inline y avatares con iniciales.
 
