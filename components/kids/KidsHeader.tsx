@@ -1,4 +1,8 @@
-export function KidsHeader() {
+type KidsHeaderProps = {
+  onAddClick?: () => void;
+};
+
+export function KidsHeader({ onAddClick }: KidsHeaderProps) {
   return (
     <div className="mb-[22px] flex items-end justify-between gap-4">
       <div>
@@ -9,9 +13,8 @@ export function KidsHeader() {
           Niños
         </h1>
       </div>
-      {/* TODO: implementar formulario de agregar niño */}
-      <a
-        href="/agregar-nino"
+      <button
+        onClick={onAddClick}
         className="flex items-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,0.7)]"
       >
         <svg
@@ -27,7 +30,7 @@ export function KidsHeader() {
           <path d="M12 5v14M5 12h14" />
         </svg>
         Agregar niño
-      </a>
+      </button>
     </div>
   );
 }
