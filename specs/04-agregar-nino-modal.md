@@ -1,6 +1,6 @@
 # SPEC 04 — Implementar modal "Agregar niño" en /kids
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02
 > **Date:** 2026-08-23
 > **Objective:** Implementar el modal "Agregar niño" accesible desde `/kids`, con 5 campos (3 obligatorios con validación de front-end), salas hardcodeadas, máscara de fecha y agregado local al mock de niños.
