@@ -22,6 +22,13 @@ const INITIAL_FORM: AddKidFormState = {
 
 const ROOM_OPTIONS: RoomOption[] = ["Soles", "Lunas", "Estrellas"];
 
+function formatDateMask(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
 type AddKidModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -80,7 +87,9 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
                 type="text"
                 placeholder="dd/mm/aaaa"
                 value={form.birthDate}
-                onChange={(e) => updateField("birthDate", e.target.value)}
+                onChange={(e) =>
+                  updateField("birthDate", formatDateMask(e.target.value))
+                }
                 className="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
               />
             </div>
