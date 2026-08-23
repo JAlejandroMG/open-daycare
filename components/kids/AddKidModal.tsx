@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { Kid } from "@/lib/_data/types";
 
 type RoomOption = "Soles" | "Lunas" | "Estrellas";
 
@@ -28,6 +29,14 @@ const INITIAL_FORM: AddKidFormState = {
 
 const ROOM_OPTIONS: RoomOption[] = ["Soles", "Lunas", "Estrellas"];
 
+const AVATAR_COLORS = [
+  { bg: "#A9D9E8", text: "#1F7A93" },
+  { bg: "#F4B8CC", text: "#C44A7A" },
+  { bg: "#B9DEC4", text: "#3E8B62" },
+  { bg: "#F4DC8E", text: "#9A7B1E" },
+  { bg: "#C9B6E8", text: "#7B5FC0" },
+];
+
 function formatDateMask(raw: string): string {
   const digits = raw.replace(/\D/g, "").slice(0, 8);
   if (digits.length <= 2) return digits;
@@ -38,9 +47,10 @@ function formatDateMask(raw: string): string {
 type AddKidModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onAddKid: (kid: Kid) => void;
 };
 
-export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
+export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
   const [form, setForm] = useState<AddKidFormState>(INITIAL_FORM);
   const [errors, setErrors] = useState<AddKidFormErrors>({});
 
@@ -73,7 +83,32 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
 
   function handleSave() {
     if (!validate()) return;
-    // Save logic will be added in Step 5
+
+    const colors = AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)];
+
+    const kid: Kid = {
+      id: String(Date.now()),
+      name: form.fullName.trim(),
+      initial: form.fullName.trim()[0].toUpperCase(),
+      age: "1 año",
+      room: form.room,
+      birthDate: form.birthDate,
+      admissionDate: new Date().toLocaleDateString("es-AR", {
+        month: "short",
+        year: "numeric",
+      }),
+      linkedParents: 0,
+      allergy: form.allergies.trim() || undefined,
+      parents: [],
+      avatarBackgroundColor: colors.bg,
+      avatarTextColor: colors.text,
+    };
+
+    onAddKid(kid);
+    alert("¡Niño agregado con éxito!");
+    setForm(INITIAL_FORM);
+    setErrors({});
+    onClose();
   }
 
   return (
