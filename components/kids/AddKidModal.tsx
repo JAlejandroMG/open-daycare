@@ -12,6 +12,12 @@ type AddKidFormState = {
   medicalNotes: string;
 };
 
+type AddKidFormErrors = {
+  fullName?: string;
+  birthDate?: string;
+  room?: string;
+};
+
 const INITIAL_FORM: AddKidFormState = {
   fullName: "",
   birthDate: "",
@@ -36,6 +42,7 @@ type AddKidModalProps = {
 
 export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
   const [form, setForm] = useState<AddKidFormState>(INITIAL_FORM);
+  const [errors, setErrors] = useState<AddKidFormErrors>({});
 
   if (!isOpen) return null;
 
@@ -44,6 +51,29 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
     value: AddKidFormState[K],
   ) {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field as keyof AddKidFormErrors]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  }
+
+  function validate(): boolean {
+    const newErrors: AddKidFormErrors = {};
+    if (!form.fullName.trim()) {
+      newErrors.fullName = "El nombre es obligatorio";
+    }
+    if (form.birthDate.length < 10) {
+      newErrors.birthDate = "Completá la fecha (dd/mm/aaaa)";
+    }
+    if (!form.room) {
+      newErrors.room = "Seleccioná una sala";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }
+
+  function handleSave() {
+    if (!validate()) return;
+    // Save logic will be added in Step 5
   }
 
   return (
@@ -59,7 +89,10 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
           <span className="font-heading text-[18px] font-semibold text-[#3F362E]">
             Agregar niño
           </span>
-          <button className="text-[15px] font-extrabold text-[#D9583C]">
+          <button
+            onClick={handleSave}
+            className="text-[15px] font-extrabold text-[#D9583C]"
+          >
             Guardar
           </button>
         </div>
@@ -74,8 +107,16 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
             placeholder="Ej. Martina López"
             value={form.fullName}
             onChange={(e) => updateField("fullName", e.target.value)}
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+            className={`mb-1 w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
+              errors.fullName ? "border-red-400" : "border-[#EADFD0]"
+            }`}
           />
+          {errors.fullName && (
+            <p className="mb-[10px] text-[13px] text-red-500">
+              {errors.fullName}
+            </p>
+          )}
+          {!errors.fullName && <div className="mb-[18px]" />}
 
           {/* Fecha de nacimiento + Sala */}
           <div className="mb-[18px] flex gap-[14px]">
@@ -90,8 +131,15 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
                 onChange={(e) =>
                   updateField("birthDate", formatDateMask(e.target.value))
                 }
-                className="w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+                className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
+                  errors.birthDate ? "border-red-400" : "border-[#EADFD0]"
+                }`}
               />
+              {errors.birthDate && (
+                <p className="mt-1 text-[13px] text-red-500">
+                  {errors.birthDate}
+                </p>
+              )}
             </div>
             <div className="flex-1">
               <label className="mb-2 block text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
@@ -103,7 +151,9 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
                   onChange={(e) =>
                     updateField("room", e.target.value as RoomOption | "")
                   }
-                  className="w-full appearance-none rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] focus:outline-none"
+                  className={`w-full appearance-none rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] focus:outline-none ${
+                    errors.room ? "border-red-400" : "border-[#EADFD0]"
+                  }`}
                 >
                   <option value="" disabled>
                     Seleccionar
@@ -128,6 +178,9 @@ export function AddKidModal({ isOpen, onClose }: AddKidModalProps) {
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </div>
+              {errors.room && (
+                <p className="mt-1 text-[13px] text-red-500">{errors.room}</p>
+              )}
             </div>
           </div>
 
