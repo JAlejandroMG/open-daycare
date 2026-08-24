@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { kids } from "@/lib/_data/mock-data";
+import { useRouter } from "next/navigation";
+import { currentUser, kids, posts } from "@/lib/_data/mock-data";
 import { POST_TYPE_CONFIG } from "@/lib/_data/post-type-config";
 import type { PostType } from "@/lib/_data/types";
 
@@ -17,6 +18,7 @@ type FormErrors = {
 };
 
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
+  const router = useRouter();
   const [recipientKidId, setRecipientKidId] = useState<string>("");
   const [type, setType] = useState<PostType | "">("");
   const [description, setDescription] = useState("");
@@ -41,6 +43,41 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
     if (!description.trim()) newErrors.description = "Escribí una descripción";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
+
+    const selectedKid = kids.find((k) => k.id === recipientKidId);
+    const isAllRoom = recipientKidId === "all";
+
+    const now = new Date();
+    const publishedAt = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+    const newPost = {
+      id: `post-${Date.now()}`,
+      type: type as PostType,
+      childName: isAllRoom ? "Anuncio general" : selectedKid!.name.split(" ")[0],
+      childInitial: isAllRoom ? "A" : selectedKid!.initial,
+      avatarBackgroundColor: isAllRoom
+        ? "bg-[#CCD8F4]"
+        : `bg-[${selectedKid!.avatarBackgroundColor}]`,
+      avatarTextColor: isAllRoom
+        ? "text-[#4E72C8]"
+        : `text-[${selectedKid!.avatarTextColor}]`,
+      publishedAt,
+      authorName: currentUser.name,
+      isAuthor: true,
+      recipient: isAllRoom ? "toda la sala" : `familia de ${selectedKid!.name.split(" ")[0]}`,
+      content: description.trim(),
+      likesCount: 0,
+      commentsCount: 0,
+    };
+
+    posts.unshift(newPost);
+    router.refresh();
+    alert("Publicación creada");
+    onClose();
+    setRecipientKidId("");
+    setType("");
+    setDescription("");
+    setErrors({});
   };
 
   return (
