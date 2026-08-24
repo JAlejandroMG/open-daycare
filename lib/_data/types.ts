@@ -1,4 +1,11 @@
-export type PostType = "achievement" | "activity" | "announcement";
+export type PostType =
+  | "achievement"
+  | "activity"
+  | "announcement"
+  | "food"
+  | "nap"
+  | "cheer"
+  | "picture";
 
 export type Post = {
   id: string;
