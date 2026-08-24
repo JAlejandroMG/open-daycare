@@ -1,12 +1,25 @@
 "use client";
 
+import { useState } from "react";
+import { kids } from "@/lib/_data/mock-data";
+
 type CreatePostModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
+  const [recipientKidId, setRecipientKidId] = useState<string>("");
+
   if (!isOpen) return null;
+
+  const selectKid = (id: string) => {
+    setRecipientKidId(id === recipientKidId ? "" : id);
+  };
+
+  const selectAll = () => {
+    setRecipientKidId(recipientKidId === "all" ? "" : "all");
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30">
@@ -35,7 +48,50 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             Publicar
           </button>
         </div>
-        <div className="px-[26px] py-6" />
+        <div className="px-[26px] py-6">
+          <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
+            PARA
+          </div>
+          <div className="mb-[22px] flex flex-wrap gap-[9px]">
+            {kids.map((kid) => {
+              const selected = recipientKidId === kid.id;
+              return (
+                <button
+                  key={kid.id}
+                  type="button"
+                  onClick={() => selectKid(kid.id)}
+                  className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-sm font-bold ${
+                    selected
+                      ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
+                      : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+                  }`}
+                >
+                  <span
+                    className="flex h-[26px] w-[26px] items-center justify-center rounded-full font-heading text-[13px] font-semibold"
+                    style={{
+                      backgroundColor: kid.avatarBackgroundColor,
+                      color: kid.avatarTextColor,
+                    }}
+                  >
+                    {kid.initial}
+                  </span>
+                  {kid.name.split(" ")[0]}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={selectAll}
+              className={`rounded-full px-4 py-1.5 text-sm font-bold ${
+                recipientKidId === "all"
+                  ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
+                  : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+              }`}
+            >
+              Toda la sala
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
