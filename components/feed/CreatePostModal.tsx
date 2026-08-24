@@ -10,19 +10,37 @@ type CreatePostModalProps = {
   onClose: () => void;
 };
 
+type FormErrors = {
+  recipient?: string;
+  type?: string;
+  description?: string;
+};
+
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const [recipientKidId, setRecipientKidId] = useState<string>("");
   const [type, setType] = useState<PostType | "">("");
   const [description, setDescription] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
   if (!isOpen) return null;
 
   const selectKid = (id: string) => {
     setRecipientKidId(id === recipientKidId ? "" : id);
+    setErrors((prev) => ({ ...prev, recipient: undefined }));
   };
 
   const selectAll = () => {
     setRecipientKidId(recipientKidId === "all" ? "" : "all");
+    setErrors((prev) => ({ ...prev, recipient: undefined }));
+  };
+
+  const handlePublish = () => {
+    const newErrors: FormErrors = {};
+    if (!recipientKidId) newErrors.recipient = "Seleccioná un destinatario";
+    if (!type) newErrors.type = "Seleccioná un tipo";
+    if (!description.trim()) newErrors.description = "Escribí una descripción";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
   };
 
   return (
@@ -47,6 +65,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </span>
           <button
             type="button"
+            onClick={handlePublish}
             className="text-[15px] font-extrabold text-[#D9583C]"
           >
             Publicar
@@ -95,6 +114,11 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               Toda la sala
             </button>
           </div>
+          {errors.recipient ? (
+            <p className="-mt-[18px] mb-[22px] text-xs text-red-500">
+              {errors.recipient}
+            </p>
+          ) : null}
           <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
             TIPO
           </div>
@@ -106,7 +130,10 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                   <button
                     key={key}
                     type="button"
-                    onClick={() => setType(selected ? "" : key)}
+                    onClick={() => {
+                      setType(selected ? "" : key);
+                      setErrors((prev) => ({ ...prev, type: undefined }));
+                    }}
                     className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${
                       selected
                         ? config.badgeClassName
@@ -119,16 +146,31 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               }
             )}
           </div>
+          {errors.type ? (
+            <p className="-mt-[18px] mb-[22px] text-xs text-red-500">
+              {errors.type}
+            </p>
+          ) : null}
           <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
             DESCRIPCIÓN
           </div>
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              setDescription(e.target.value);
+              setErrors((prev) => ({ ...prev, description: undefined }));
+            }}
             placeholder="Contá cómo le fue hoy…"
-            className="mb-[22px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white p-[14px_16px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+            className={`mb-[22px] w-full resize-y rounded-[14px] border-[1.5px] bg-white p-[14px_16px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
+              errors.description ? "border-red-400" : "border-[#EADFD0]"
+            }`}
             rows={4}
           />
+          {errors.description ? (
+            <p className="-mt-[18px] mb-[22px] text-xs text-red-500">
+              {errors.description}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
