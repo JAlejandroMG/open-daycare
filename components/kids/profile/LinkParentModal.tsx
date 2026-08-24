@@ -37,7 +37,12 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
 
     if (Object.keys(newErrors).length > 0) return;
 
-    // Step 4 will add submission logic here
+    alert("Invitación enviada");
+    onClose();
+    setName("");
+    setEmail("");
+    setRelationship("Mamá");
+    setErrors({});
   }
 
   return (
