@@ -88,7 +88,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
         onClick={onClose}
         className="absolute inset-0"
       />
-      <div className="relative z-10 mx-4 max-w-[580px] w-full overflow-hidden rounded-3xl border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,.35)]">
+      <div className="relative z-10 mx-4 max-h-[90vh] w-full max-w-[580px] overflow-y-auto rounded-3xl border border-[#ECE0D0] bg-[#FBF4EC] shadow-[0_20px_50px_-24px_rgba(63,54,46,.35)]">
         <div className="flex items-center justify-between border-b border-[#ECE0D0] px-[26px] py-5">
           <button
             type="button"
@@ -172,10 +172,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                       setErrors((prev) => ({ ...prev, type: undefined }));
                     }}
                     className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${
-                      selected
-                        ? config.badgeClassName
-                        : "border border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+                      selected ? "ring-2 ring-offset-2 ring-[#3F362E]" : ""
                     }`}
+                    style={{
+                      backgroundColor: config.backgroundColor,
+                      color: config.textColor,
+                    }}
                   >
                     {config.label}
                   </button>
