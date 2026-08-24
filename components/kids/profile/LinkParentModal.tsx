@@ -10,12 +10,35 @@ type LinkParentModalProps = {
   onClose: () => void;
 };
 
+type LinkParentFormErrors = {
+  name?: string;
+  email?: string;
+};
+
 export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [relationship, setRelationship] = useState<ParentRelationship>("Mamá");
+  const [errors, setErrors] = useState<LinkParentFormErrors>({});
 
   if (!isOpen) return null;
+
+  function handleSubmit() {
+    const newErrors: LinkParentFormErrors = {};
+
+    if (!name.trim()) {
+      newErrors.name = "El nombre es obligatorio";
+    }
+    if (!email.trim()) {
+      newErrors.email = "El email es obligatorio";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    // Step 4 will add submission logic here
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 p-6 pt-10 sm:pt-[40px]">
@@ -74,9 +97,18 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
             type="text"
             placeholder="Ej. Diego Fernández"
             value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+            onChange={(e) => {
+              setName(e.target.value);
+              if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+            }}
+            className={`mb-1 w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
+              errors.name ? "border-red-400" : "border-[#EADFD0]"
+            }`}
           />
+          {errors.name && (
+            <p className="mb-[10px] text-[13px] text-red-500">{errors.name}</p>
+          )}
+          {!errors.name && <div className="mb-[18px]" />}
 
           <div className="mb-2 text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             EMAIL
@@ -85,9 +117,18 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
             type="email"
             placeholder="correo@ejemplo.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
+            }}
+            className={`mb-1 w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
+              errors.email ? "border-red-400" : "border-[#EADFD0]"
+            }`}
           />
+          {errors.email && (
+            <p className="mb-[10px] text-[13px] text-red-500">{errors.email}</p>
+          )}
+          {!errors.email && <div className="mb-[18px]" />}
 
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[0.7px] text-[#94887B]">
             PARENTESCO
@@ -121,6 +162,7 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
 
           <button
             type="button"
+            onClick={handleSubmit}
             className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
           >
             <svg
