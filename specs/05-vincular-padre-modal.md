@@ -1,6 +1,6 @@
 # SPEC 05 — Implementar modal "Vincular padre" en perfil de niño
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 02
 > **Date:** 2026-08-23
 > **Objective:** Implementar el modal "Vincular padre" activado desde el enlace "Vincular otro padre" en `/kids/[id]`, con datos hardcodeados, validación de campos obligatorios y diseño fiel al mockup.
