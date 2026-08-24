@@ -13,6 +13,7 @@ type CreatePostModalProps = {
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const [recipientKidId, setRecipientKidId] = useState<string>("");
   const [type, setType] = useState<PostType | "">("");
+  const [description, setDescription] = useState("");
 
   if (!isOpen) return null;
 
@@ -118,6 +119,16 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               }
             )}
           </div>
+          <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
+            DESCRIPCIÓN
+          </div>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Contá cómo le fue hoy…"
+            className="mb-[22px] w-full resize-y rounded-[14px] border-[1.5px] border-[#EADFD0] bg-white p-[14px_16px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none"
+            rows={4}
+          />
         </div>
       </div>
     </div>
