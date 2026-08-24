@@ -1,7 +1,12 @@
-export function LinkParentButton() {
+type LinkParentButtonProps = {
+  onClick?: () => void;
+};
+
+export function LinkParentButton({ onClick }: LinkParentButtonProps) {
   return (
-    <a
-      href="/vincular-padre"
+    <button
+      type="button"
+      onClick={onClick}
       className="flex items-center gap-3 pt-2"
     >
       <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-dashed border-[#D8CBBA] text-[#B0A290]">
@@ -22,6 +27,6 @@ export function LinkParentButton() {
       <span className="text-[14.5px] font-extrabold text-[#C5503A]">
         Vincular otro padre
       </span>
-    </a>
+    </button>
   );
 }
