@@ -44,6 +44,39 @@ function formatDateMask(raw: string): string {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
+function validateBirthDate(dateStr: string): string | null {
+  if (dateStr.length < 10) return "Completá la fecha (dd/mm/aaaa)";
+
+  const [dayStr, monthStr, yearStr] = dateStr.split("/");
+  const day = parseInt(dayStr, 10);
+  const month = parseInt(monthStr, 10);
+  const year = parseInt(yearStr, 10);
+
+  const date = new Date(year, month - 1, day);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return "La fecha no es válida";
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (date > today) {
+    return "La fecha no puede ser futura";
+  }
+
+  const maxAgeDate = new Date(today);
+  maxAgeDate.setFullYear(today.getFullYear() - 12);
+  if (date < maxAgeDate) {
+    return "El niño debe tener entre 0 y 12 años";
+  }
+
+  return null;
+}
+
 type AddKidModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -66,13 +99,37 @@ export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
     }
   }
 
+  function handleBlur(field: keyof AddKidFormState) {
+    setErrors((prev) => {
+      const next = { ...prev };
+
+      if (field === "fullName") {
+        next.fullName = form.fullName.trim()
+          ? undefined
+          : "El nombre es obligatorio";
+      }
+
+      if (field === "birthDate") {
+        const error = validateBirthDate(form.birthDate);
+        next.birthDate = error || undefined;
+      }
+
+      if (field === "room") {
+        next.room = form.room ? undefined : "Seleccioná una sala";
+      }
+
+      return next;
+    });
+  }
+
   function validate(): boolean {
     const newErrors: AddKidFormErrors = {};
     if (!form.fullName.trim()) {
       newErrors.fullName = "El nombre es obligatorio";
     }
-    if (form.birthDate.length < 10) {
-      newErrors.birthDate = "Completá la fecha (dd/mm/aaaa)";
+    const birthDateError = validateBirthDate(form.birthDate);
+    if (birthDateError) {
+      newErrors.birthDate = birthDateError;
     }
     if (!form.room) {
       newErrors.room = "Seleccioná una sala";
@@ -142,6 +199,7 @@ export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
             placeholder="Ej. Martina López"
             value={form.fullName}
             onChange={(e) => updateField("fullName", e.target.value)}
+            onBlur={() => handleBlur("fullName")}
             className={`mb-1 w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
               errors.fullName ? "border-red-400" : "border-[#EADFD0]"
             }`}
@@ -166,6 +224,7 @@ export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
                 onChange={(e) =>
                   updateField("birthDate", formatDateMask(e.target.value))
                 }
+                onBlur={() => handleBlur("birthDate")}
                 className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
                   errors.birthDate ? "border-red-400" : "border-[#EADFD0]"
                 }`}
@@ -186,6 +245,7 @@ export function AddKidModal({ isOpen, onClose, onAddKid }: AddKidModalProps) {
                   onChange={(e) =>
                     updateField("room", e.target.value as RoomOption | "")
                   }
+                  onBlur={() => handleBlur("room")}
                   className={`w-full appearance-none rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] pr-10 text-[15px] font-bold text-[#3F362E] focus:outline-none ${
                     errors.room ? "border-red-400" : "border-[#EADFD0]"
                   }`}
