@@ -1,6 +1,6 @@
 # SPEC 06 — Implementar modal "Nueva publicación" en el feed
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-08-24
 > **Objective:** Implementar el modal "Nueva publicación" activado desde el sidebar en `/`, con destinatarios hardcodeados, 7 tipos de post, validación de campos obligatorios y agregado inmediato al feed.
