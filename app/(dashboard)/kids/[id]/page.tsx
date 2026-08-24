@@ -6,6 +6,7 @@ import { KidAllergyAlert } from "@/components/kids/profile/KidAllergyAlert";
 import { KidInfoCard } from "@/components/kids/profile/KidInfoCard";
 import { ParentsList } from "@/components/kids/profile/ParentsList";
 import { DailySummaryButton } from "@/components/kids/profile/DailySummaryButton";
+import { KidProfileClient } from "@/components/kids/profile/KidProfileClient";
 
 type KidProfilePageProps = {
   params: Promise<{ id: string }>;
@@ -58,7 +59,9 @@ export default async function KidProfilePage({ params }: KidProfilePageProps) {
 
         <div className="flex w-[300px] flex-none flex-col gap-[14px]">
           <DailySummaryButton />
-          <ParentsList parents={kid.parents} />
+          <ParentsList parents={kid.parents}>
+            <KidProfileClient kid={kid} />
+          </ParentsList>
         </div>
       </div>
     </div>
