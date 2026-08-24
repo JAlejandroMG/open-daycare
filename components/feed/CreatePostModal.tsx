@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { kids } from "@/lib/_data/mock-data";
+import { POST_TYPE_CONFIG } from "@/lib/_data/post-type-config";
+import type { PostType } from "@/lib/_data/types";
 
 type CreatePostModalProps = {
   isOpen: boolean;
@@ -10,6 +12,7 @@ type CreatePostModalProps = {
 
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const [recipientKidId, setRecipientKidId] = useState<string>("");
+  const [type, setType] = useState<PostType | "">("");
 
   if (!isOpen) return null;
 
@@ -90,6 +93,30 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             >
               Toda la sala
             </button>
+          </div>
+          <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
+            TIPO
+          </div>
+          <div className="mb-[22px] flex flex-wrap gap-[9px]">
+            {(Object.entries(POST_TYPE_CONFIG) as [PostType, (typeof POST_TYPE_CONFIG)[PostType]][]).map(
+              ([key, config]) => {
+                const selected = type === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setType(selected ? "" : key)}
+                    className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${
+                      selected
+                        ? config.badgeClassName
+                        : "border border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+                    }`}
+                  >
+                    {config.label}
+                  </button>
+                );
+              }
+            )}
           </div>
         </div>
       </div>
