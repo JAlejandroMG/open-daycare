@@ -1,6 +1,6 @@
 # SPEC 07 — Crear tabla daycares en Supabase con migraciones imperativas
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** Ninguno
 > **Date:** 2026-08-25
 > **Objective:** Crear la tabla `daycares` en Supabase mediante una migración imperativa local, activar RLS con política básica y poblarla con 4 registros de seed data.
@@ -80,15 +80,16 @@ Convenciones seguidas:
 
 ## Acceptance criteria
 
-- [ ] Existe el archivo `supabase/migrations/001_create_daycares.sql` con el DDL completo, RLS y política.
-- [ ] La tabla `daycares` aparece en el Supabase Dashboard (Table Editor).
-- [ ] La tabla tiene las columnas `id`, `name`, `address` y `created_at`.
-- [ ] Row Level Security está activado en la tabla `daycares`.
-- [ ] Existe la política `Allow public read` permitiendo SELECT a `anon` y `authenticated`.
-- [ ] La tabla contiene exactamente 4 filas de seed data.
-- [ ] Una de las filas tiene `name = 'Guardería Sala Soles'`.
-- [ ] `npm run lint` pasa sin errores.
-- [ ] `npx tsc --noEmit` pasa sin errores.
+- [x] Existe el archivo `supabase/migrations/001_create_daycares.sql` con el DDL completo, RLS y política.
+- [x] La tabla `daycares` aparece en el Supabase Dashboard (Table Editor).
+- [x] La tabla tiene las columnas `id`, `name`, `address` y `created_at`.
+- [x] Row Level Security está activado en la tabla `daycares`.
+- [x] Existe la política `Allow public read` permitiendo SELECT a `anon` y `authenticated`.
+- [x] La tabla contiene exactamente 4 filas de seed data.
+- [x] Una de las filas tiene `name = 'Guardería Sala Soles'`.
+- [x] `npm run lint` pasa sin errores.
+  > Nota: Hay 2 errores preexistentes en `references/pantallas/support.js` (ReactDOM.render deprecated y no-assign-module-variable). No son regresión de este spec — el archivo existe desde el primer commit y no fue modificado por esta migración.
+- [x] `npx tsc --noEmit` pasa sin errores.
 
 ---
 
