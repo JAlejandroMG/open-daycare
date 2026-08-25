@@ -49,6 +49,12 @@ specs/                # Specs de features
 .opencode/commands/   # Comandos (/verify-spec)
 ```
 
+## Base de datos
+
+- **Proveedor:** Supabase (project ref `umhlkncdrlpsobcusyek`)
+- **Migrations:** `supabase/migrations/NNN_descriptive_name.sql`
+- **Convención:** Siempre crear migración antes de modificar schema
+
 ## Diseño
 
 Los mockups en `references/pantallas/*.dc.html` y `references/screenshots/*.png` son la fuente de verdad del UI. Copia en **español rioplatense** con voseo ("Ingresá", "Publicá", "Guardá").

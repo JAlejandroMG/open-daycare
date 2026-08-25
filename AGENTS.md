@@ -53,3 +53,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Code rules
 - Follow Clean Code principles.
 - Function and variable names in english.
+
+## Database rules
+- **Always create a migration file** when modifying the database schema. Never apply DDL changes directly to the remote project without a corresponding migration in `supabase/migrations/`.
+- Migration files are versioned in git and serve as the single source of truth for the database schema.
+- Naming convention: `NNN_descriptive_name.sql` (e.g., `001_create_daycares.sql`, `002_add_email_to_users.sql`).
+- Each migration should be idempotent when possible (use `IF NOT EXISTS`, `IF EXISTS`).
