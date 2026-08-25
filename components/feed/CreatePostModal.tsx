@@ -19,52 +19,78 @@ type FormErrors = {
 
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const router = useRouter();
-  const [recipientKidId, setRecipientKidId] = useState<string>("");
+  const [recipientKidIds, setRecipientKidIds] = useState<string[]>([]);
   const [type, setType] = useState<PostType | "">("");
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
   if (!isOpen) return null;
 
-  const selectKid = (id: string) => {
-    setRecipientKidId(id === recipientKidId ? "" : id);
+  const isAllRoom = recipientKidIds.includes("all");
+
+  const toggleKid = (id: string) => {
+    if (isAllRoom) {
+      setRecipientKidIds([id]);
+    } else {
+      setRecipientKidIds((prev) =>
+        prev.includes(id) ? prev.filter((k) => k !== id) : [...prev, id]
+      );
+    }
     setErrors((prev) => ({ ...prev, recipient: undefined }));
   };
 
   const selectAll = () => {
-    setRecipientKidId(recipientKidId === "all" ? "" : "all");
+    if (isAllRoom) {
+      setRecipientKidIds([]);
+    } else {
+      setRecipientKidIds(["all"]);
+    }
     setErrors((prev) => ({ ...prev, recipient: undefined }));
   };
 
   const handlePublish = () => {
     const newErrors: FormErrors = {};
-    if (!recipientKidId) newErrors.recipient = "Seleccioná un destinatario";
+    if (recipientKidIds.length === 0) newErrors.recipient = "Seleccioná al menos un destinatario";
     if (!type) newErrors.type = "Seleccioná un tipo";
     if (!description.trim()) newErrors.description = "Escribí una descripción";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    const selectedKid = kids.find((k) => k.id === recipientKidId);
-    const isAllRoom = recipientKidId === "all";
-
     const now = new Date();
     const publishedAt = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+
+    let childNames: string[];
+    let childInitials: string[];
+    let avatarBackgroundColors: string[];
+    let avatarTextColors: string[];
+    let recipientsList: string[];
+
+    if (isAllRoom) {
+      childNames = ["Anuncio general"];
+      childInitials = ["A"];
+      avatarBackgroundColors = ["bg-[#CCD8F4]"];
+      avatarTextColors = ["text-[#4E72C8]"];
+      recipientsList = ["toda la sala"];
+    } else {
+      const selectedKids = kids.filter((k) => recipientKidIds.includes(k.id));
+      childNames = selectedKids.map((k) => k.name.split(" ")[0]);
+      childInitials = selectedKids.map((k) => k.initial);
+      avatarBackgroundColors = selectedKids.map((k) => `bg-[${k.avatarBackgroundColor}]`);
+      avatarTextColors = selectedKids.map((k) => `text-[${k.avatarTextColor}]`);
+      recipientsList = selectedKids.map((k) => `familia de ${k.name.split(" ")[0]}`);
+    }
 
     const newPost = {
       id: `post-${Date.now()}`,
       type: type as PostType,
-      childName: isAllRoom ? "Anuncio general" : selectedKid!.name.split(" ")[0],
-      childInitial: isAllRoom ? "A" : selectedKid!.initial,
-      avatarBackgroundColor: isAllRoom
-        ? "bg-[#CCD8F4]"
-        : `bg-[${selectedKid!.avatarBackgroundColor}]`,
-      avatarTextColor: isAllRoom
-        ? "text-[#4E72C8]"
-        : `text-[${selectedKid!.avatarTextColor}]`,
+      childNames,
+      childInitials,
+      avatarBackgroundColors,
+      avatarTextColors,
       publishedAt,
       authorName: currentUser.name,
       isAuthor: true,
-      recipient: isAllRoom ? "toda la sala" : `familia de ${selectedKid!.name.split(" ")[0]}`,
+      recipients: recipientsList,
       content: description.trim(),
       likesCount: 0,
       commentsCount: 0,
@@ -74,7 +100,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
     router.refresh();
     alert("Publicación creada");
     onClose();
-    setRecipientKidId("");
+    setRecipientKidIds([]);
     setType("");
     setDescription("");
     setErrors({});
@@ -114,12 +140,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
             {kids.map((kid) => {
-              const selected = recipientKidId === kid.id;
+              const selected = !isAllRoom && recipientKidIds.includes(kid.id);
               return (
                 <button
                   key={kid.id}
                   type="button"
-                  onClick={() => selectKid(kid.id)}
+                  onClick={() => toggleKid(kid.id)}
                   className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-sm font-bold ${
                     selected
                       ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
@@ -143,7 +169,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               type="button"
               onClick={selectAll}
               className={`rounded-full px-4 py-1.5 text-sm font-bold ${
-                recipientKidId === "all"
+                isAllRoom
                   ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
                   : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
               }`}
