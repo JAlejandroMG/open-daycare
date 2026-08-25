@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "lsp": true,
   "mcp": {
     "playwright": {
       "type": "local",
@@ -9,5 +10,11 @@
       },
       "enabled": true
     }
-  }
+  },
+  "references": {
+    "docs": {
+      "description": "Schema de base de datos, tablas, columnas y referencias a crear, esto no está implementado en la base de datos, sólo es para referencia de la base de datos",
+      "path": "../07-DB-Schema"
+    },
+  },
 }
