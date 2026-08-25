@@ -1,16 +1,23 @@
-export type PostType = "achievement" | "activity" | "announcement";
+export type PostType =
+  | "achievement"
+  | "activity"
+  | "announcement"
+  | "food"
+  | "nap"
+  | "cheer"
+  | "picture";
 
 export type Post = {
   id: string;
   type: PostType;
-  childName: string;
-  childInitial: string;
-  avatarBackgroundColor: string;
-  avatarTextColor: string;
+  childNames: string[];
+  childInitials: string[];
+  avatarBackgroundColors: string[];
+  avatarTextColors: string[];
   publishedAt: string;
   authorName: string;
   isAuthor: boolean;
-  recipient: string;
+  recipients: string[];
   content: string;
   photoPlaceholder?: string;
   likesCount: number;
