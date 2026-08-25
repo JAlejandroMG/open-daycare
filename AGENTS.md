@@ -43,6 +43,12 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and any document Playwright-related must live in `.playwright-mcp/` (gitignored).
 - Context7: use it to fetch up-to-date framework documentation.
+- Supabase: remote MCP for database, auth, edge functions, debugging, and branching. Project ref: `umhlkncdrlpsobcusyek`.
+
+## Skills
+
+- Supabase (`.agents/skills/supabase/`): instructions for working with Supabase products, client libraries, RLS, and debugging.
+- Postgres Best Practices (`.agents/skills/supabase-postgres-best-practices/`): schema design, migrations, RLS policies, indexes, triggers, and performance tuning.
 
 ## Code rules
 - Follow Clean Code principles.
