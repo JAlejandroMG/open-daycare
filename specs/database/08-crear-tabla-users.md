@@ -1,6 +1,6 @@
 # SPEC 08 — Crear tabla users y enums en Supabase
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 07
 > **Date:** 2026-08-25
 > **Objective:** Crear la tabla `users`, los enums `user_role` y `user_status`, activar RLS con política básica e insertar un usuario staff de seed para pruebas.
