@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { currentUser } from "@/lib/_data/mock-data";
+import { createClient } from "@/utils/supabase/client";
 import { CreatePostButton } from "./CreatePostButton";
 
 type IconProps = { className?: string };
@@ -95,8 +97,20 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Mi cuenta", href: "/mi-cuenta", Icon: AccountIcon },
 ];
 
-export function SidebarContent() {
+export function SidebarContent({ user }: { user: User }) {
   const pathname = usePathname();
+
+  const name =
+    user.user_metadata?.name ||
+    user.email?.split("@")[0] ||
+    "Usuario";
+  const initial = name.charAt(0).toUpperCase();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
@@ -156,18 +170,19 @@ export function SidebarContent() {
       <div className="mt-[10px] border-t border-border-soft pt-[14px]">
         <div className="flex items-center gap-[11px] px-2 py-[6px]">
           <span className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-[#F2937A] font-heading text-base font-semibold text-white">
-            {currentUser.initial}
+            {initial}
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-extrabold text-foreground">
-              {currentUser.name}
+              {name}
             </span>
             <span className="block text-xs text-text-muted">
               {currentUser.role} · {currentUser.room}
             </span>
           </span>
-          <a
-            href="/login"
+          <button
+            type="button"
+            onClick={handleLogout}
             title="Cerrar sesión"
             className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-[#F6ECDF] text-[#94887B]"
           >
@@ -183,7 +198,7 @@ export function SidebarContent() {
             >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
             </svg>
-          </a>
+          </button>
         </div>
       </div>
     </>
