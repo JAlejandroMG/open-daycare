@@ -1,15 +1,29 @@
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { createClient } from "@/utils/supabase/server";
 import { Sidebar } from "@/components/feed/Sidebar";
 import { SidebarDrawer } from "@/components/feed/SidebarDrawer";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <SidebarDrawer />
+      <Sidebar user={user} />
+      <SidebarDrawer user={user} />
       <main className="min-w-0 flex-1">{children}</main>
     </div>
   );

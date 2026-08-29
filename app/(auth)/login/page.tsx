@@ -1,6 +1,37 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (authError) {
+      setError(authError.message);
+      setIsLoading(false);
+      return;
+    }
+
+    router.push("/");
+  };
+
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[1.05fr_1fr] bg-background">
       {/* Left panel — coral gradient, hidden on mobile */}
@@ -52,7 +83,7 @@ export default function LoginPage() {
 
       {/* Right panel — form */}
       <div className="flex items-center justify-center p-10">
-        <div className="w-full max-w-[392px]">
+        <form onSubmit={handleSubmit} className="w-full max-w-[392px]">
           <h2 className="font-heading font-semibold text-[30px] mb-1.5 text-foreground">
             Iniciar sesión
           </h2>
@@ -66,8 +97,10 @@ export default function LoginPage() {
           </label>
           <input
             type="email"
-            defaultValue="caro@opendaycare.com"
-            className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-border-soft bg-white text-[15px] text-foreground mb-[18px] focus:outline-none"
+            placeholder="caro@opendaycare.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-border-soft bg-white text-[15px] text-foreground mb-[18px] focus:outline-none placeholder:text-text-muted"
           />
 
           {/* Password */}
@@ -77,6 +110,8 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-border-soft bg-white text-[15px] text-foreground mb-2.5 focus:outline-none placeholder:text-text-muted"
           />
 
@@ -88,9 +123,20 @@ export default function LoginPage() {
           </div>
 
           {/* Login button */}
-          <button className="block w-full text-center py-[15px] rounded-[15px] bg-gradient-to-b from-coral-300 to-coral-500 text-white font-extrabold text-base cursor-pointer shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)]">
-            Iniciar sesión
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="block w-full text-center py-[15px] rounded-[15px] bg-gradient-to-b from-coral-300 to-coral-500 text-white font-extrabold text-base cursor-pointer shadow-[0_10px_22px_-8px_rgba(238,129,100,0.7)] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Ingresando…" : "Iniciar sesión"}
           </button>
+
+          {/* Error message */}
+          {error ? (
+            <p className="mt-3 text-center text-sm font-semibold text-red-600">
+              {error}
+            </p>
+          ) : null}
 
           {/* Link to activate account */}
           <p className="text-center mt-6 text-text-secondary text-[14.5px]">
@@ -102,7 +148,7 @@ export default function LoginPage() {
               Activá tu cuenta
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );

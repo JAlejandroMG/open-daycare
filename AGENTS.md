@@ -13,6 +13,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Next.js 16.3.1 (App Router) + React 19 + Tailwind CSS 4. Tailwind is configured only through `@tailwindcss/postcss` and the CSS `@theme` in `app/globals.css` — there is no `tailwind.config`.
 - Path alias `@/*` → repo root (see `tsconfig.json`).
 - `app/` contains the App Router structure with `(dashboard)` route group.
+- **Authentication:** Supabase Auth (email + password) with `proxy.ts` for route protection.
 
 ## Supabase Client Packages
 
@@ -71,6 +72,41 @@ export async function myAction() {
 Defined in `.env` (never commit this file):
 - `NEXT_PUBLIC_SUPABASE_URL` — project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — publishable key (not the secret/service_role key).
+
+## Authentication & Route Protection
+
+Next.js 16 uses `proxy.ts` at the project root (replaces deprecated `middleware.ts`).
+
+### Proxy pattern (`proxy.ts`)
+
+- Exports `proxy(request: NextRequest)` and `config` with `matcher`
+- Uses `createServerClient` from `@supabase/ssr` with `getAll()`/`setAll()` on cookies
+- Calls `supabase.auth.getSession()` (cookie read, 0 network calls) for performance
+- Public routes: `/login`, `/activate-account`. All others require authentication.
+- No session + not public route → redirect to `/login`
+- Session + public route → redirect to `/`
+
+### User prop pattern
+
+The authenticated `user` object flows through the component chain:
+
+```
+app/(dashboard)/layout.tsx  (Server Component, async)
+  → supabase.auth.getUser()
+  → passes `user` prop to:
+    → Sidebar (Server Component)
+      → SidebarContent (Client Component)
+    → SidebarDrawer (Client Component)
+      → SidebarContent (Client Component)
+```
+
+`SidebarContent` derives `name` and `initial` from `user.user_metadata?.name || user.email`.
+
+### Test credentials
+
+- Email: `alex@google.com`
+- Password: `Abc@123`
+- User exists in both `auth.users` and `public.users` (synced UUID)
 
 ## Commands
 

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { SidebarContent } from "./SidebarContent";
 
-export function SidebarDrawer() {
+export function SidebarDrawer({ user }: { user: User }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -65,7 +66,7 @@ export function SidebarDrawer() {
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
-            <SidebarContent />
+            <SidebarContent user={user} />
           </aside>
         </div>
       ) : null}
