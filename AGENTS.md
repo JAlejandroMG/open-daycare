@@ -14,6 +14,64 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Path alias `@/*` → repo root (see `tsconfig.json`).
 - `app/` contains the App Router structure with `(dashboard)` route group.
 
+## Supabase Client Packages
+
+- `@supabase/supabase-js` ^2.112.4 — core JS client.
+- `@supabase/ssr` ^0.12.5 — SSR cookie-based auth helpers for Next.js.
+
+### Client helpers (`utils/supabase/`)
+
+| File | Export | Usage |
+|---|---|---|
+| `utils/supabase/server.ts` | `createClient(cookieStore)` | Server Components, Server Actions, Route Handlers. Pass `await cookies()` from `next/headers`. |
+| `utils/supabase/client.ts` | `createClient()` | Client Components (`'use client'`). No arguments needed. |
+| `utils/supabase/middleware.ts` | `createClient(request)` | Middleware only. Returns the `NextResponse` with refreshed cookies. |
+
+### Usage patterns
+
+**Server Component:**
+```ts
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
+
+export default async function Page() {
+  const cookieStore = await cookies()
+  const supabase = createClient(cookieStore)
+  const { data } = await supabase.from('table').select()
+  // ...
+}
+```
+
+**Client Component:**
+```ts
+'use client'
+import { createClient } from '@/utils/supabase/client'
+
+export default function Component() {
+  const supabase = createClient()
+  // use supabase in effects or handlers
+}
+```
+
+**Server Action:**
+```ts
+'use server'
+import { createClient } from '@/utils/supabase/server'
+import { cookies } from 'next/headers'
+
+export async function myAction() {
+  const cookieStore = await cookies()
+  const supabase = createClient(cookieStore)
+  // ...
+}
+```
+
+### Environment variables
+
+Defined in `.env` (never commit this file):
+- `NEXT_PUBLIC_SUPABASE_URL` — project URL.
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — publishable key (not the secret/service_role key).
+
 ## Commands
 
 - `npm run dev` — dev server. Re-adds the auto-generated block at the top of this file on start; don't fight it.
