@@ -63,3 +63,9 @@ CREATE POLICY "children_select_same_daycare" ON public.children
 -- Otorgar permisos de lectura
 GRANT SELECT ON public.rooms TO authenticated;
 GRANT SELECT ON public.children TO authenticated;
+
+-- Seed data: tres salas vinculadas al daycare existente
+INSERT INTO public.rooms (daycare_id, name)
+SELECT d.id, s.name
+FROM (SELECT id FROM public.daycares LIMIT 1) d
+CROSS JOIN (VALUES ('Soles'), ('Lunas'), ('Estrellas')) AS s(name);
