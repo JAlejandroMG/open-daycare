@@ -1,6 +1,8 @@
-import { kids } from "@/lib/_data/mock-data";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/server";
+import { mapChildToKid } from "@/lib/_data/mappers";
 import { KidProfileHeader } from "@/components/kids/profile/KidProfileHeader";
 import { KidAllergyAlert } from "@/components/kids/profile/KidAllergyAlert";
 import { KidInfoCard } from "@/components/kids/profile/KidInfoCard";
@@ -14,11 +16,20 @@ type KidProfilePageProps = {
 
 export default async function KidProfilePage({ params }: KidProfilePageProps) {
   const { id } = await params;
-  const kid = kids.find((k) => k.id === id);
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
 
-  if (!kid) {
+  const { data: child } = await supabase
+    .from("children")
+    .select("*, rooms(name)")
+    .eq("id", id)
+    .single();
+
+  if (!child) {
     notFound();
   }
+
+  const kid = mapChildToKid(child, child.rooms?.name ?? "Sin sala");
 
   return (
     <div className="mx-auto w-full max-w-[820px] px-10 pb-20 pt-[34px]">
