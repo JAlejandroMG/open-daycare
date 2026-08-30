@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import type { Kid } from "@/lib/_data/types";
-import { kids as mockKids } from "@/lib/_data/mock-data";
 import { KidsHeader } from "./KidsHeader";
 import { KidSearch } from "./KidSearch";
 import { AddKidModal } from "./AddKidModal";
 
-export function KidsPageClient() {
-  const [kids, setKids] = useState<Kid[]>([...mockKids]);
+type KidsPageClientProps = {
+  initialKids: Kid[];
+};
+
+export function KidsPageClient({ initialKids }: KidsPageClientProps) {
+  const [kids, setKids] = useState<Kid[]>(initialKids);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   function handleAddKid(kid: Kid) {
