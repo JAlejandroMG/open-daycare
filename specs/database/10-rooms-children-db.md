@@ -3,7 +3,7 @@
 > **Status:** Approved
 > **Depends on:** SPEC 02
 > **Date:** 2026-08-29
-> **Objective:** Crear las tablas `rooms` y `children` en Supabase, poblar `rooms` con tres salas de seed data, y actualizar las páginas `/kids` y `/kids/[id]` para leer datos reales de la base de datos en lugar de usar datos hardcodeados.
+> **Objective:** Crear las tablas `rooms` y `children` en Supabase, poblar `rooms` con tres salas de seed data, permitir agregar niños desde el modal (persistiendo en DB), y actualizar las páginas `/kids` y `/kids/[id]` para leer datos reales de la base de datos en lugar de usar datos hardcodeados.
 
 ---
 
@@ -23,15 +23,20 @@
 - Mapear la respuesta de Supabase al tipo `Kid` local para no romper los componentes existentes.
 - Actualizar `lib/_data/mock-data.ts` para eliminar el array `kids` hardcodeado.
 - Mantener los componentes `KidCard`, `KidList`, `KidProfileHeader`, `KidAllergyAlert`, `KidInfoCard`, `ParentsList` sin cambios de interfaz (siguen recibiendo `Kid`).
+- Server Action `createChild()` en `app/(dashboard)/kids/actions.ts` para insertar en `public.children`.
+- Dropdown de salas dinámico en `AddKidModal`: fetch de `rooms` desde Supabase, pasado como prop desde el Server Component.
+- Conversión de fecha `dd/mm/aaaa` → `YYYY-MM-DD` para Postgres.
+- Revalidación de `/kids` tras insertar (`revalidatePath`).
+- Política RLS `INSERT` en `children` para usuarios autenticados del mismo daycare.
 
 **Out of scope (for future specs):**
 
-- Seed data para `children` (niños) — la tabla se crea vacía y se llenará vía UI posteriormente.
+- Seed data para `children` (niños) — la tabla se crea vacía y se llenará vía UI.
 - Tabla `parent_children` y vínculos padre-niño reales.
-- CRUD de niños (agregar, editar, eliminar) — este spec es solo lectura; el formulario de agregar niño queda para otro spec.
+- Editar y eliminar niños (solo crear por ahora).
 - Tabla `invitations` y generación de códigos reales.
 - Actualización del feed (`/`) para leer posts desde la base de datos.
-- Actualización de otros modales (`Agregar niño`, `Vincular padre`) para persistir en DB.
+- Actualización del modal `Vincular padre` para persistir en DB.
 - Cambios en el tipo `Post` o en los posts del feed.
 
 ---
@@ -120,13 +125,33 @@ Función `mapChildToKid(child, roomName): Kid` en un archivo nuevo `lib/_data/ma
 
 6. **Actualizar `app/(dashboard)/kids/[id]/page.tsx`** — usar `createClient` para hacer `supabase.from('children').select('*, rooms(name)').eq('id', params.id).single()`. Si no existe, `notFound()`. Mapear con `mapChildToKid` y pasar a los componentes de perfil.
 
-7. **Actualizar `lib/_data/mock-data.ts`** — eliminar el array `kids` hardcodeado y reemplazarlo por un comentario indicando que los datos ahora vienen de la base de datos. Mantener `posts` y `currentUser` intactos.
+7. **Crear Server Action `app/(dashboard)/kids/actions.ts`** — función `createChild(formData)` que:
+   - Recibe `full_name`, `birth_date` (dd/mm/aaaa), `room` (nombre de sala), `allergy_tags` (texto libre), `medical_notes`.
+   - Busca `room_id` con `SELECT id FROM rooms WHERE name = $1`.
+   - Convierte `birth_date` de `dd/mm/aaaa` a `YYYY-MM-DD`.
+   - Inserta en `children` con `enrolled_at = CURRENT_DATE`, `status = 'active'`, `allergy_tags = '{tag}'` (split por coma, trim, lowercase).
+   - Llama `revalidatePath('/kids')` para refrescar la lista.
 
-8. **Verificar que los componentes `KidCard`, `KidList`, `KidProfileHeader`, etc. no se rompan** — como el tipo `Kid` no cambia, los componentes deben seguir funcionando sin modificaciones. Confirmar que `kid.id` recibido desde Supabase (UUID string) funciona como parámetro de ruta y como key en React.
+8. **Agregar política RLS `children_insert_same_daycare`** — en la misma migración o en una nueva:
+   - `CREATE POLICY children_insert_same_daycare ON public.children FOR INSERT TO authenticated WITH CHECK (...)` — permite insertar niños en salas del daycare del usuario autenticado.
 
-9. **Ejecutar `npm run lint` y `npx tsc --noEmit`** para verificar que no hay errores de tipo.
+9. **Actualizar `app/(dashboard)/kids/page.tsx`** — además de pasar `kids`, pasar `rooms` al `KidsPageClient` (fetch de `supabase.from('rooms').select('id, name')`).
 
-10. **Verificar visualmente** — navegar a `/kids` y `/kids/[id]` con `npm run dev`. Confirmar que la lista muestra los niños desde la base de datos (inicialmente vacía hasta que se agreguen) y que el perfil funciona cuando existan registros.
+10. **Actualizar `KidsPageClient`** — recibir `rooms: { id: string; name: string }[]` como prop y pasarlas a `AddKidModal`.
+
+11. **Actualizar `AddKidModal`** — cambios:
+    - Recibir `rooms` como prop (en lugar de `ROOM_OPTIONS` hardcodeado).
+    - Llamar al Server Action `createChild()` en `handleSave` en lugar de crear un objeto `Kid` local.
+    - Mostrar feedback de éxito/error (loading state, mensaje de error si falla).
+    - Cerrar modal y refrescar la lista tras éxito.
+
+12. **Actualizar `lib/_data/mock-data.ts`** — eliminar el array `kids` hardcodeado y reemplazarlo por un comentario indicando que los datos ahora vienen de la base de datos. Mantener `posts` y `currentUser` intactos.
+
+13. **Verificar que los componentes `KidCard`, `KidList`, `KidProfileHeader`, etc. no se rompan** — como el tipo `Kid` no cambia, los componentes deben seguir funcionando sin modificaciones. Confirmar que `kid.id` recibido desde Supabase (UUID string) funciona como parámetro de ruta y como key en React.
+
+14. **Ejecutar `npm run lint` y `npx tsc --noEmit`** para verificar que no hay errores de tipo.
+
+15. **Verificar visualmente** — navegar a `/kids` y `/kids/[id]` con `npm run dev`. Confirmar que la lista muestra los niños desde la base de datos (inicialmente vacía hasta que se agreguen) y que el perfil funciona cuando existan registros. Confirmar que el modal agrega niños a la DB y aparecen en la lista.
 
 ---
 
@@ -143,6 +168,10 @@ Función `mapChildToKid(child, roomName): Kid` en un archivo nuevo `lib/_data/ma
 - [ ] Los avatares mantienen los colores de fondo y texto calculados determinísticamente.
 - [ ] Los componentes `KidCard`, `KidList`, `KidProfileHeader`, `KidAllergyAlert`, `KidInfoCard`, `ParentsList` no requieren cambios de código (solo reciben `Kid` como antes).
 - [ ] `lib/_data/mock-data.ts` ya no contiene el array `kids` hardcodeado.
+- [ ] Al guardar un niño en el modal, se inserta un registro en la tabla `children`.
+- [ ] El dropdown de salas en el modal muestra las salas reales de la base de datos.
+- [ ] Después de agregar un niño, aparece en la lista de `/kids` sin recargar la página manualmente.
+- [ ] El perfil del niño recién creado es accesible en `/kids/[id]`.
 - [ ] `npm run lint` pasa sin errores.
 - [ ] `npx tsc --noEmit` pasa sin errores.
 
@@ -156,11 +185,14 @@ Función `mapChildToKid(child, roomName): Kid` en un archivo nuevo `lib/_data/ma
 - **Sí:** Seed data de `rooms` dentro de la migración SQL. Es la forma más simple de poblar la base de datos de forma reproducible.
 - **Sí:** Política RLS vinculada a `daycare_id` vía la tabla `users`. Alineado con el schema existente y permite multitenancy futura.
 - **Sí:** Filtrar `children` por `status = 'active'` en las queries del frontend. Implementa borrado lógico desde el inicio.
-- **No:** No se agrega seed data para `children`. Los niños se agregarán desde cero vía UI en specs futuros.
+- **Sí:** Server Action para crear niños (en lugar de API route). Mejor integración con Next.js App Router y revalidación automática.
+- **Sí:** Dropdown de salas dinámico desde la DB. Evita desincronización si se agregan/quitan salas.
+- **Sí:** Un solo tag de alergia (texto libre). El usuario escribe "Maní, Lactosa" y se guarda como `allergy_tags = '{maní,lactosa}'`.
+- **No:** No se agrega seed data para `children`. Los niños se agregarán desde cero vía UI.
 - **No:** No se crea la tabla `parent_children` ni se migran los datos de padres. Los padres siguen como mock vacío en el perfil.
 - **No:** No se modifican los tipos `Post`, `CurrentUser` ni el array `posts`. El feed sigue usando mock data.
 - **No:** No se elimina `lib/_data/mock-data.ts` por completo. Solo se remueve el array `kids`; `posts` y `currentUser` se mantienen.
-- **No:** No se implementa Server Action para crear/editar/eliminar niños. Es lectura pura.
+- **No:** No se implementa editar ni eliminar niños. Solo crear.
 
 ---
 
@@ -173,6 +205,9 @@ Función `mapChildToKid(child, roomName): Kid` en un archivo nuevo `lib/_data/ma
 | La búsqueda local (`KidSearch`) filtra sobre datos ya cargados; si la lista crece mucho puede ser lento | Aceptable para el volumen esperado. Si crece, se moverá a búsqueda server-side en otro spec. |
 | RLS policies pueden bloquear lecturas si el usuario no tiene `daycare_id` seteado | Verificar que el usuario de test (`alex@google.com`) tenga `daycare_id` asignado antes de probar. |
 | Seed data con `daycare_id` hardcodeado puede fallar si el UUID no existe | Usar subquery `SELECT id FROM daycares LIMIT 1` en la migración para obtener el daycare real. |
+| El nombre de sala en el modal no coincide exactamente con `rooms.name` en DB | Usar match exacto; el dropdown se carga dinámicamente desde la DB, así que siempre coinciden. |
+| La conversión de fecha `dd/mm/aaaa` puede fallar con formatos inesperados | Validar en frontend y backend; usar `new Date(year, month-1, day)` para construir la fecha. |
+| RLS INSERT puede bloquear inserciones si el usuario no tiene `daycare_id` | Verificar que el usuario de test tenga `daycare_id` asignado. Crear política INSERT que vincule vía `rooms.daycare_id`. |
 
 ---
 
@@ -180,10 +215,10 @@ Función `mapChildToKid(child, roomName): Kid` en un archivo nuevo `lib/_data/ma
 
 - Seed data para la tabla `children` (niños).
 - Tabla `parent_children` ni vínculos padre-niño reales.
-- CRUD de niños (crear, editar, archivar, eliminar).
+- Editar y eliminar niños (solo crear por ahora).
 - Tabla `invitations` ni generación de códigos de invitación reales.
 - Conexión del feed (`/`) o de los posts a la base de datos.
-- Actualización de los modales `Agregar niño` o `Vincular padre` para persistir en DB.
+- Actualización del modal `Vincular padre` para persistir en DB.
 - Cambios en el tipo `Post` o en el mock data de publicaciones.
 
 Cada una de esas, si llega, va en su propio spec.
