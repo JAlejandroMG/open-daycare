@@ -64,6 +64,25 @@ CREATE POLICY "children_select_same_daycare" ON public.children
 GRANT SELECT ON public.rooms TO authenticated;
 GRANT SELECT ON public.children TO authenticated;
 
+-- Política de inserción para children: usuarios autenticados del mismo daycare
+CREATE POLICY "children_insert_same_daycare" ON public.children
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (
+        room_id IN (
+            SELECT r.id
+            FROM public.rooms r
+            WHERE r.daycare_id = (
+                SELECT u.daycare_id
+                FROM public.users u
+                WHERE u.id = (SELECT auth.uid())
+            )
+        )
+    );
+
+-- Otorgar permisos de inserción
+GRANT INSERT ON public.children TO authenticated;
+
 -- Seed data: tres salas vinculadas al daycare existente
 INSERT INTO public.rooms (daycare_id, name)
 SELECT d.id, s.name

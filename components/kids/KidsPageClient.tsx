@@ -6,26 +6,27 @@ import { KidsHeader } from "./KidsHeader";
 import { KidSearch } from "./KidSearch";
 import { AddKidModal } from "./AddKidModal";
 
-type KidsPageClientProps = {
-  initialKids: Kid[];
+type Room = {
+  id: string;
+  name: string;
 };
 
-export function KidsPageClient({ initialKids }: KidsPageClientProps) {
-  const [kids, setKids] = useState<Kid[]>(initialKids);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+type KidsPageClientProps = {
+  initialKids: Kid[];
+  rooms: Room[];
+};
 
-  function handleAddKid(kid: Kid) {
-    setKids((prev) => [...prev, kid]);
-  }
+export function KidsPageClient({ initialKids, rooms }: KidsPageClientProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <KidsHeader onAddClick={() => setIsModalOpen(true)} />
-      <KidSearch kids={kids} />
+      <KidSearch kids={initialKids} />
       <AddKidModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddKid={handleAddKid}
+        rooms={rooms}
       />
     </>
   );
