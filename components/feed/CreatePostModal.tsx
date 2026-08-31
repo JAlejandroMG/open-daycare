@@ -139,32 +139,38 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             PARA
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
-            {kids.map((kid) => {
-              const selected = !isAllRoom && recipientKidIds.includes(kid.id);
-              return (
-                <button
-                  key={kid.id}
-                  type="button"
-                  onClick={() => toggleKid(kid.id)}
-                  className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-sm font-bold ${
-                    selected
-                      ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
-                      : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
-                  }`}
-                >
-                  <span
-                    className="flex h-[26px] w-[26px] items-center justify-center rounded-full font-heading text-[13px] font-semibold"
-                    style={{
-                      backgroundColor: kid.avatarBackgroundColor,
-                      color: kid.avatarTextColor,
-                    }}
+            {kids.length === 0 ? (
+              <p className="text-sm text-[#94887B]">
+                No hay niños cargados todavía.
+              </p>
+            ) : (
+              kids.map((kid) => {
+                const selected = !isAllRoom && recipientKidIds.includes(kid.id);
+                return (
+                  <button
+                    key={kid.id}
+                    type="button"
+                    onClick={() => toggleKid(kid.id)}
+                    className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-sm font-bold ${
+                      selected
+                        ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
+                        : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
+                    }`}
                   >
-                    {kid.initial}
-                  </span>
-                  {kid.name.split(" ")[0]}
-                </button>
-              );
-            })}
+                    <span
+                      className="flex h-[26px] w-[26px] items-center justify-center rounded-full font-heading text-[13px] font-semibold"
+                      style={{
+                        backgroundColor: kid.avatarBackgroundColor,
+                        color: kid.avatarTextColor,
+                      }}
+                    >
+                      {kid.initial}
+                    </span>
+                    {kid.name.split(" ")[0]}
+                  </button>
+                );
+              })
+            )}
             <button
               type="button"
               onClick={selectAll}

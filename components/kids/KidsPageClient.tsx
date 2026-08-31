@@ -2,27 +2,31 @@
 
 import { useState } from "react";
 import type { Kid } from "@/lib/_data/types";
-import { kids as mockKids } from "@/lib/_data/mock-data";
 import { KidsHeader } from "./KidsHeader";
 import { KidSearch } from "./KidSearch";
 import { AddKidModal } from "./AddKidModal";
 
-export function KidsPageClient() {
-  const [kids, setKids] = useState<Kid[]>([...mockKids]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+type Room = {
+  id: string;
+  name: string;
+};
 
-  function handleAddKid(kid: Kid) {
-    setKids((prev) => [...prev, kid]);
-  }
+type KidsPageClientProps = {
+  initialKids: Kid[];
+  rooms: Room[];
+};
+
+export function KidsPageClient({ initialKids, rooms }: KidsPageClientProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <KidsHeader onAddClick={() => setIsModalOpen(true)} />
-      <KidSearch kids={kids} />
+      <KidSearch kids={initialKids} />
       <AddKidModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAddKid={handleAddKid}
+        rooms={rooms}
       />
     </>
   );
