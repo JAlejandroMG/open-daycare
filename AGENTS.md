@@ -72,6 +72,8 @@ export async function myAction() {
 Defined in `.env` (never commit this file):
 - `NEXT_PUBLIC_SUPABASE_URL` — project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — publishable key (not the secret/service_role key).
+- `NEXT_PUBLIC_APP_URL` — base URL for email links (e.g. `http://localhost:3000` in dev).
+- `RESEND_API_KEY` — Resend API key for sending invitation emails. Set manually; never commit.
 
 ## Authentication & Route Protection
 
@@ -84,7 +86,8 @@ Next.js 16 uses `proxy.ts` at the project root (replaces deprecated `middleware.
 - Calls `supabase.auth.getSession()` (cookie read, 0 network calls) for performance
 - Public routes: `/login`, `/activate-account`. All others require authentication.
 - No session + not public route → redirect to `/login`
-- Session + public route → redirect to `/`
+- Session + `/login` → redirect to `/`
+- `/activate-account` is accessible with or without session (invitation links may be opened while logged in)
 
 ### User prop pattern
 

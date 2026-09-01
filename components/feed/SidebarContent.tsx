@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { currentUser } from "@/lib/_data/mock-data";
 import { createClient } from "@/utils/supabase/client";
@@ -99,6 +99,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export function SidebarContent({ user }: { user: User }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const name =
     user.user_metadata?.name ||
@@ -109,7 +110,7 @@ export function SidebarContent({ user }: { user: User }) {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = "/login";
+    router.push("/login");
   };
 
   const isActive = (href: string) => {

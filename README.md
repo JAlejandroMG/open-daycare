@@ -58,7 +58,7 @@ El sistema usa **Supabase Auth** (email + password) con el patrón Proxy de Next
 - **Rutas públicas:** `/login`, `/activate-account`
 - **Rutas protegidas:** Todas las demás requieren sesión activa
 - **Login:** `supabase.auth.signInWithPassword()` desde Client Component
-- **Logout:** `supabase.auth.signOut()` con `window.location.href` para forzar recarga completa
+- **Logout:** `supabase.auth.signOut()` + `router.push("/login")`
 
 ### Credenciales de prueba
 
@@ -71,6 +71,24 @@ El sistema usa **Supabase Auth** (email + password) con el patrón Proxy de Next
 - **Proveedor:** Supabase (project ref `umhlkncdrlpsobcusyek`)
 - **Migrations:** `supabase/migrations/NNN_descriptive_name.sql`
 - **Convención:** Siempre crear migración antes de modificar schema
+
+## Invitación de padres
+
+Flujo completo de invitación de padres vía email con Resend:
+
+1. **Staff** abre el modal "Vincular padre" desde el perfil de un niño
+2. Ingresa nombre, email y parentesco → se envía un email con código de invitación
+3. **Padre** recibe el email con link a `/activate-account?code=XXXXX`
+4. Ingresa su nombre, email, contraseña y código → se crea su cuenta y se vincula al niño
+
+### Variables de entorno
+
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key de Supabase |
+| `NEXT_PUBLIC_APP_URL` | URL base para links de email (ej. `http://localhost:3000`) |
+| `RESEND_API_KEY` | API key de Resend (completar manualmente, no commitear) |
 
 ## Diseño
 
