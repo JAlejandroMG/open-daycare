@@ -94,19 +94,73 @@ supabase <group> <command> --help  # Flags for a specific command
 
 ## Supabase MCP Server
 
-For setup instructions, server URL, and configuration, see the [MCP setup guide](https://supabase.com/docs/guides/getting-started/mcp).
+For additional setup instructions and advanced options, see the [MCP setup guide](https://supabase.com/docs/guides/getting-started/mcp).
 
-**Troubleshooting connection issues** — follow these steps in order:
+### Configuration (OpenCode)
 
-1. **Check if the server is reachable:**
-   `curl -so /dev/null -w "%{http_code}" https://mcp.supabase.com/mcp`
-   A `401` is expected (no token) and means the server is up. Timeout or "connection refused" means it may be down.
+Add this configuration to the **global** OpenCode config file:
 
-2. **Check `.mcp.json` configuration:**
-   Verify the project root has a valid `.mcp.json` with the correct server URL. If missing, create one pointing to `https://mcp.supabase.com/mcp`.
+**File:** `~/.config/opencode/opencode.json`
 
-3. **Authenticate the MCP server:**
-   If the server is reachable and `.mcp.json` is correct but tools aren't visible, the user needs to authenticate. The Supabase MCP server uses OAuth 2.1 — tell the user to trigger the auth flow in their agent, complete it in the browser, and reload the session.
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "supabase": {
+      "type": "remote",
+      "url": "https://mcp.supabase.com/mcp?project_ref=umhlkncdrlpsobcusyek",
+      "enabled": true
+    }
+  }
+}
+```
+
+**Notes:**
+- `project_ref=umhlkncdrlpsobcusyek` scopes the server to the **OpenDayCare** project.
+- For **read-only access** (recommended when only querying data), append `&read_only=true` to the URL.
+- To limit available tools, append `&features=database,docs` (or any comma-separated subset of tool groups).
+
+### Authentication (OAuth 2.1)
+
+Run this command from your terminal:
+
+```bash
+opencode mcp auth supabase
+```
+
+**What happens:**
+1. Your default browser opens.
+2. Sign in to your Supabase account.
+3. Authorize OpenCode to access your organization.
+4. Select the organization that contains the OpenDayCare project.
+5. Return to OpenCode after completion.
+
+### Verify the connection
+
+After authenticating, reload the OpenCode session and run:
+
+```bash
+/mcp
+```
+
+You should see the `supabase` server listed and connected.
+
+Alternatively, ask OpenCode: *"¿Qué tablas hay en la base de datos?"* — it should respond using MCP tools.
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| Server not visible in `/mcp` | Ensure `~/.config/opencode/opencode.json` is valid JSON and the server has `"enabled": true`. |
+| Authentication failed | Re-run `opencode mcp auth supabase`. |
+| Cannot access the project | Verify you selected the correct organization during the OAuth flow. |
+| Timeout / connection refused | Check if `https://mcp.supabase.com/mcp` is reachable with `curl -so /dev/null -w "%{http_code}" https://mcp.supabase.com/mcp` — a `401` is expected and means the server is up. |
+
+### Security recommendations
+
+- **Do not connect to production.** Use the MCP server with a development or staging project only.
+- **Prefer read-only mode** when you only need to inspect data: add `&read_only=true` to the URL.
+- **Always review SQL before executing.** Most MCP clients ask for confirmation on each tool call — keep this setting enabled.
 
 ## Supabase Documentation
 

@@ -141,7 +141,7 @@ app/(dashboard)/layout.tsx  (Server Component, async)
 
 - Playwright: configured in `opencode.json` (`HEADLESS=false`). Playwright screenshots and any document Playwright-related must live in `.playwright-mcp/` (gitignored).
 - Context7: use it to fetch up-to-date framework documentation.
-- Supabase: remote MCP for database, auth, edge functions, debugging, and branching. Project ref: `umhlkncdrlpsobcusyek`.
+- Supabase: remote MCP for database, auth, edge functions, debugging, and branching. Project ref: `umhlkncdrlpsobcusyek`. See `.agents/skills/supabase/SKILL.md` for authentication steps.
 
 ## Skills
 
