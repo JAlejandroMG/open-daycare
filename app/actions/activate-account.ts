@@ -3,13 +3,66 @@
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 
+type InvitationDetails = {
+  parentName: string;
+  childName: string;
+  childRoom: string;
+};
+
+type InvitationResult =
+  | { success: true; data: InvitationDetails }
+  | { success: false; error: string };
+
+export async function getInvitationByCode(code: string): Promise<InvitationResult> {
+  try {
+    if (!code?.trim()) {
+      return { success: false, error: "El código es obligatorio" };
+    }
+
+    const cookieStore = await cookies();
+    const supabase = createClient(cookieStore);
+
+    const { data: invitation, error } = await supabase
+      .from("invitations")
+      .select(`
+        full_name,
+        children!inner (
+          full_name,
+          rooms!inner (name)
+        )
+      `)
+      .eq("code", code.trim().toUpperCase())
+      .eq("status", "pending")
+      .gt("expires_at", new Date().toISOString())
+      .single();
+
+    if (error || !invitation) {
+      return { success: false, error: "Código de invitación inválido o expirado" };
+    }
+
+    const child = Array.isArray(invitation.children) ? invitation.children[0] : invitation.children;
+    const room = Array.isArray(child.rooms) ? child.rooms[0] : child.rooms;
+
+    return {
+      success: true,
+      data: {
+        parentName: invitation.full_name,
+        childName: child.full_name,
+        childRoom: room.name,
+      },
+    };
+  } catch (error) {
+    console.error("Error in getInvitationByCode:", error);
+    return { success: false, error: "Error al buscar la invitación" };
+  }
+}
+
 type RegistrationResult = { success: true } | { success: false; error: string };
 
 export async function registerParentWithInvitation(
   code: string,
   email: string,
-  password: string,
-  fullName: string
+  password: string
 ): Promise<RegistrationResult> {
   try {
     if (!code?.trim()) {
@@ -23,9 +76,6 @@ export async function registerParentWithInvitation(
     }
     if (password.length < 6) {
       return { success: false, error: "La contraseña debe tener al menos 6 caracteres" };
-    }
-    if (!fullName?.trim()) {
-      return { success: false, error: "El nombre es obligatorio" };
     }
 
     const cookieStore = await cookies();
@@ -59,7 +109,6 @@ export async function registerParentWithInvitation(
     const { error: rpcError } = await supabase.rpc("register_parent", {
       p_code: code.trim().toUpperCase(),
       p_email: email.trim(),
-      p_full_name: fullName.trim(),
       p_auth_user_id: authData.user.id,
     });
 
