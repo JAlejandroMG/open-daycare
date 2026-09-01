@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { registerParentWithInvitation } from "@/app/actions/activate-account";
 
 type FormErrors = {
   code?: string;
@@ -13,6 +14,7 @@ type FormErrors = {
 
 export default function ActivateAccountPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const codeParam = searchParams.get("code");
   const showCodeField = !!codeParam;
 
@@ -54,8 +56,22 @@ export default function ActivateAccountPage() {
     if (Object.keys(newErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // TODO: Step 7 — connect to registerParentWithInvitation Server Action
+
+    const result = await registerParentWithInvitation(
+      showCodeField ? code : "",
+      email,
+      password,
+      fullName
+    );
+
     setIsSubmitting(false);
+
+    if (!result.success) {
+      setSubmitError(result.error);
+      return;
+    }
+
+    router.push("/login?registered=true");
   }
 
   return (
