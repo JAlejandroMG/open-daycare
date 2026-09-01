@@ -72,6 +72,8 @@ export async function myAction() {
 Defined in `.env` (never commit this file):
 - `NEXT_PUBLIC_SUPABASE_URL` — project URL.
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` — publishable key (not the secret/service_role key).
+- `NEXT_PUBLIC_APP_URL` — base URL for email links (e.g. `http://localhost:3000` in dev).
+- `RESEND_API_KEY` — Resend API key for sending invitation emails. Set manually; never commit.
 
 ## Authentication & Route Protection
 
