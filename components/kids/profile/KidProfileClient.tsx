@@ -16,6 +16,7 @@ export function KidProfileClient({ kid }: KidProfileClientProps) {
     <>
       <LinkParentButton onClick={() => setIsModalOpen(true)} />
       <LinkParentModal
+        childId={kid.id}
         kidName={kid.name}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { sendParentInvitation } from "@/app/actions/invitation";
 
 type ParentRelationship = "Mamá" | "Papá" | "Tutor/a";
 
 type LinkParentModalProps = {
+  childId: string;
   kidName: string;
   isOpen: boolean;
   onClose: () => void;
@@ -15,15 +17,17 @@ type LinkParentFormErrors = {
   email?: string;
 };
 
-export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalProps) {
+export function LinkParentModal({ childId, kidName, isOpen, onClose }: LinkParentModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [relationship, setRelationship] = useState<ParentRelationship>("Mamá");
   const [errors, setErrors] = useState<LinkParentFormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  function handleSubmit() {
+  async function handleSubmit() {
     const newErrors: LinkParentFormErrors = {};
 
     if (!name.trim()) {
@@ -37,12 +41,25 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
 
     if (Object.keys(newErrors).length > 0) return;
 
-    alert("Invitación enviada");
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const result = await sendParentInvitation(childId, name, email, relationship);
+
+    setIsSubmitting(false);
+
+    if (!result.success) {
+      setSubmitError(result.error);
+      return;
+    }
+
+    alert("Invitación enviada correctamente");
     onClose();
     setName("");
     setEmail("");
     setRelationship("Mamá");
     setErrors({});
+    setSubmitError(null);
   }
 
   return (
@@ -159,31 +176,51 @@ export function LinkParentModal({ kidName, isOpen, onClose }: LinkParentModalPro
             <div className="mb-2 text-[12px] font-extrabold tracking-[0.7px] text-[#A88526]">
               CÓDIGO DE INVITACIÓN
             </div>
-            <div className="font-[Fredoka] text-[34px] font-semibold tracking-[7px] text-[#8A7234]">
-              7K4P9
+            <div className="text-[14px] text-[#8A7234]">
+              Se generará automáticamente y se enviará por email
             </div>
             <div className="mt-[6px] text-[13px] text-[#A88526]">Vence en 7 días</div>
           </div>
 
+          {submitError && (
+            <p className="mb-4 text-[13px] text-red-500 text-center">{submitError}</p>
+          )}
+
           <button
             type="button"
             onClick={handleSubmit}
-            className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
+            disabled={isSubmitting}
+            className="flex w-full items-center justify-center gap-[9px] rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] py-[14px] text-[15.5px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)] disabled:opacity-60"
           >
-            <svg
-              width="19"
-              height="19"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#fff"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m22 2-7 20-4-9-9-4z" />
-              <path d="M22 2 11 13" />
-            </svg>
-            Enviar invitación
+            {isSubmitting ? (
+              <svg
+                className="animate-spin"
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2.5"
+              >
+                <circle cx="12" cy="12" r="10" strokeOpacity="0.3" />
+                <path d="M12 2a10 10 0 0 1 10 10" />
+              </svg>
+            ) : (
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="m22 2-7 20-4-9-9-4z" />
+                <path d="M22 2 11 13" />
+              </svg>
+            )}
+            {isSubmitting ? "Enviando..." : "Enviar invitación"}
           </button>
         </div>
       </div>
