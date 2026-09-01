@@ -86,7 +86,8 @@ Next.js 16 uses `proxy.ts` at the project root (replaces deprecated `middleware.
 - Calls `supabase.auth.getSession()` (cookie read, 0 network calls) for performance
 - Public routes: `/login`, `/activate-account`. All others require authentication.
 - No session + not public route → redirect to `/login`
-- Session + public route → redirect to `/`
+- Session + `/login` → redirect to `/`
+- `/activate-account` is accessible with or without session (invitation links may be opened while logged in)
 
 ### User prop pattern
 

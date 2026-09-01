@@ -43,7 +43,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (session && isPublicRoute) {
+  if (session && path.startsWith("/login")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
