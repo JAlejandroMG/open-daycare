@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
@@ -7,14 +8,13 @@ import { SidebarDrawer } from "@/components/feed/SidebarDrawer";
 export default async function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
 
   if (!user) {
     redirect("/login");

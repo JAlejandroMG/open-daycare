@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { currentUser, kids, posts } from "@/lib/_data/mock-data";
 import { POST_TYPE_CONFIG } from "@/lib/_data/post-type-config";
@@ -17,6 +17,10 @@ type FormErrors = {
   description?: string;
 };
 
+function getFirstName(name: string): string {
+  return name.split(" ")[0];
+}
+
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const router = useRouter();
   const [recipientKidIds, setRecipientKidIds] = useState<string[]>([]);
@@ -24,29 +28,40 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
 
-  if (!isOpen) return null;
-
   const isAllRoom = recipientKidIds.includes("all");
 
-  const toggleKid = (id: string) => {
-    if (isAllRoom) {
-      setRecipientKidIds([id]);
-    } else {
-      setRecipientKidIds((prev) =>
-        prev.includes(id) ? prev.filter((k) => k !== id) : [...prev, id]
-      );
-    }
-    setErrors((prev) => ({ ...prev, recipient: undefined }));
-  };
+  const toggleKid = useCallback(
+    (id: string) => {
+      if (isAllRoom) {
+        setRecipientKidIds([id]);
+      } else {
+        setRecipientKidIds((prev) =>
+          prev.includes(id) ? prev.filter((k) => k !== id) : [...prev, id]
+        );
+      }
+      setErrors((prev) => ({ ...prev, recipient: undefined }));
+    },
+    [isAllRoom]
+  );
 
-  const selectAll = () => {
+  const selectAll = useCallback(() => {
     if (isAllRoom) {
       setRecipientKidIds([]);
     } else {
       setRecipientKidIds(["all"]);
     }
     setErrors((prev) => ({ ...prev, recipient: undefined }));
-  };
+  }, [isAllRoom]);
+
+  const handleDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setDescription(e.target.value);
+      setErrors((prev) => ({ ...prev, description: undefined }));
+    },
+    []
+  );
+
+  if (!isOpen) return null;
 
   const handlePublish = () => {
     const newErrors: FormErrors = {};
@@ -73,11 +88,11 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
       recipientsList = ["toda la sala"];
     } else {
       const selectedKids = kids.filter((k) => recipientKidIds.includes(k.id));
-      childNames = selectedKids.map((k) => k.name.split(" ")[0]);
+      childNames = selectedKids.map((k) => getFirstName(k.name));
       childInitials = selectedKids.map((k) => k.initial);
       avatarBackgroundColors = selectedKids.map((k) => `bg-[${k.avatarBackgroundColor}]`);
       avatarTextColors = selectedKids.map((k) => `text-[${k.avatarTextColor}]`);
-      recipientsList = selectedKids.map((k) => `familia de ${k.name.split(" ")[0]}`);
+      recipientsList = selectedKids.map((k) => `familia de ${getFirstName(k.name)}`);
     }
 
     const newPost = {
@@ -166,7 +181,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                     >
                       {kid.initial}
                     </span>
-                    {kid.name.split(" ")[0]}
+                    {getFirstName(kid.name)}
                   </button>
                 );
               })
@@ -227,10 +242,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </div>
           <textarea
             value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-              setErrors((prev) => ({ ...prev, description: undefined }));
-            }}
+            onChange={handleDescriptionChange}
             placeholder="Contá cómo le fue hoy…"
             className={`mb-[22px] w-full resize-y rounded-[14px] border-[1.5px] bg-white p-[14px_16px] text-[15px] leading-[1.5] text-[#3F362E] placeholder:text-[#B6A99B] focus:outline-none ${
               errors.description ? "border-red-400" : "border-[#EADFD0]"
