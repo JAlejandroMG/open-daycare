@@ -7,6 +7,12 @@ import { currentUser } from "@/lib/_data/mock-data";
 import { createClient } from "@/utils/supabase/client";
 import { CreatePostButton } from "./CreatePostButton";
 
+type ChildItem = {
+  id: string;
+  full_name: string;
+  rooms: { name: string }[];
+};
+
 type IconProps = { className?: string };
 
 function HomeIcon({ className }: IconProps) {
@@ -97,7 +103,13 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Mi cuenta", href: "/mi-cuenta", Icon: AccountIcon },
 ];
 
-export function SidebarContent({ user }: { user: User }) {
+export function SidebarContent({
+  user,
+  childrenList,
+}: {
+  user: User;
+  childrenList: ChildItem[];
+}) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -146,7 +158,7 @@ export function SidebarContent({ user }: { user: User }) {
         </span>
       </Link>
 
-      <CreatePostButton />
+      <CreatePostButton childrenList={childrenList} />
 
       <nav className="flex flex-1 flex-col gap-1">
         {NAV_ITEMS.map(({ label, href, Icon }) => {

@@ -2,13 +2,20 @@
 
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { currentUser, kids, posts } from "@/lib/_data/mock-data";
+import { currentUser, posts } from "@/lib/_data/mock-data";
 import { POST_TYPE_CONFIG } from "@/lib/_data/post-type-config";
 import type { PostType } from "@/lib/_data/types";
+
+type ChildItem = {
+  id: string;
+  full_name: string;
+  rooms: { name: string }[];
+};
 
 type CreatePostModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  childrenList: ChildItem[];
 };
 
 type FormErrors = {
@@ -21,7 +28,11 @@ function getFirstName(name: string): string {
   return name.split(" ")[0];
 }
 
-export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
+export function CreatePostModal({
+  isOpen,
+  onClose,
+  childrenList,
+}: CreatePostModalProps) {
   const router = useRouter();
   const [recipientKidIds, setRecipientKidIds] = useState<string[]>([]);
   const [type, setType] = useState<PostType | "">("");
@@ -87,12 +98,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
       avatarTextColors = ["text-[#4E72C8]"];
       recipientsList = ["toda la sala"];
     } else {
-      const selectedKids = kids.filter((k) => recipientKidIds.includes(k.id));
-      childNames = selectedKids.map((k) => getFirstName(k.name));
-      childInitials = selectedKids.map((k) => k.initial);
-      avatarBackgroundColors = selectedKids.map((k) => `bg-[${k.avatarBackgroundColor}]`);
-      avatarTextColors = selectedKids.map((k) => `text-[${k.avatarTextColor}]`);
-      recipientsList = selectedKids.map((k) => `familia de ${getFirstName(k.name)}`);
+      const selectedKids = childrenList.filter((k) => recipientKidIds.includes(k.id));
+      childNames = selectedKids.map((k) => getFirstName(k.full_name));
+      childInitials = selectedKids.map((k) => k.full_name.charAt(0).toUpperCase());
+      avatarBackgroundColors = selectedKids.map(() => "bg-[#A9D9E8]");
+      avatarTextColors = selectedKids.map(() => "text-[#1F7A93]");
+      recipientsList = selectedKids.map((k) => `familia de ${getFirstName(k.full_name)}`);
     }
 
     const newPost = {
@@ -155,18 +166,18 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             PARA
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
-            {kids.length === 0 ? (
+            {childrenList.length === 0 ? (
               <p className="text-sm text-[#94887B]">
                 No hay niños cargados todavía.
               </p>
             ) : (
-              kids.map((kid) => {
-                const selected = !isAllRoom && recipientKidIds.includes(kid.id);
+              childrenList.map((child) => {
+                const selected = !isAllRoom && recipientKidIds.includes(child.id);
                 return (
                   <button
-                    key={kid.id}
+                    key={child.id}
                     type="button"
-                    onClick={() => toggleKid(kid.id)}
+                    onClick={() => toggleKid(child.id)}
                     className={`flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-3.5 text-sm font-bold ${
                       selected
                         ? "border-[1.5px] border-[#3F362E] bg-[#3F362E] text-white"
@@ -174,15 +185,11 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                     }`}
                   >
                     <span
-                      className="flex h-[26px] w-[26px] items-center justify-center rounded-full font-heading text-[13px] font-semibold"
-                      style={{
-                        backgroundColor: kid.avatarBackgroundColor,
-                        color: kid.avatarTextColor,
-                      }}
+                      className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#A9D9E8] font-heading text-[13px] font-semibold text-[#1F7A93]"
                     >
-                      {kid.initial}
+                      {child.full_name.charAt(0).toUpperCase()}
                     </span>
-                    {getFirstName(kid.name)}
+                    {getFirstName(child.full_name)}
                   </button>
                 );
               })

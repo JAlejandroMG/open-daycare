@@ -20,10 +20,16 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const { data: childrenList } = await supabase
+    .from("children")
+    .select("id, full_name, rooms(name)")
+    .eq("status", "active")
+    .order("full_name");
+
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar user={user} />
-      <SidebarDrawer user={user} />
+      <Sidebar user={user} childrenList={childrenList || []} />
+      <SidebarDrawer user={user} childrenList={childrenList || []} />
       <main className="min-w-0 flex-1">{children}</main>
     </div>
   );

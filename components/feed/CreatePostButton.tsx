@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { CreatePostModal } from "./CreatePostModal";
 
-export function CreatePostButton() {
+type ChildItem = {
+  id: string;
+  full_name: string;
+  rooms: { name: string }[];
+};
+
+export function CreatePostButton({
+  childrenList,
+}: {
+  childrenList: ChildItem[];
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -30,6 +40,7 @@ export function CreatePostButton() {
       <CreatePostModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        childrenList={childrenList}
       />
     </>
   );
