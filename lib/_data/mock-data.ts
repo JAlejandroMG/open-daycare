@@ -21,6 +21,7 @@ export const posts: Post[] = [
     recipients: ["familia de Mateo"],
     content:
       "¡Usó el orinal solito por primera vez! Estaba feliz de contárselo a todos. Un gran paso.",
+    photos: [],
     likesCount: 3,
     commentsCount: 1,
   },
@@ -37,7 +38,7 @@ export const posts: Post[] = [
     recipients: ["familia de Mateo"],
     content:
       "Pintamos con témperas esta mañana. Mateo eligió el azul para todo y se concentró un montón mezclando colores.",
-    photoPlaceholder: "Foto · pintando con témperas",
+    photos: [],
     likesCount: 5,
     commentsCount: 2,
   },
@@ -54,6 +55,7 @@ export const posts: Post[] = [
     recipients: ["toda la sala"],
     content:
       "El viernes salimos al parque por la mañana. Recuerden mandar gorra y una botellita de agua.",
+    photos: [],
     likesCount: 8,
     commentsCount: 0,
   },

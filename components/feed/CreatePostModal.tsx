@@ -107,6 +107,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
       isAuthor: true,
       recipients: recipientsList,
       content: description.trim(),
+      photos: [],
       likesCount: 0,
       commentsCount: 0,
     };
