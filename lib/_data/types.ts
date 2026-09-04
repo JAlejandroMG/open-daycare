@@ -2,10 +2,10 @@ export type PostType =
   | "achievement"
   | "activity"
   | "announcement"
-  | "food"
+  | "meal"
   | "nap"
   | "cheer"
-  | "picture";
+  | "photo";
 
 export type Post = {
   id: string;
@@ -19,7 +19,7 @@ export type Post = {
   isAuthor: boolean;
   recipients: string[];
   content: string;
-  photoPlaceholder?: string;
+  photos: string[];
   likesCount: number;
   commentsCount: number;
 };

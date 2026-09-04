@@ -91,19 +91,23 @@ Next.js 16 uses `proxy.ts` at the project root (replaces deprecated `middleware.
 
 ### User prop pattern
 
-The authenticated `user` object flows through the component chain:
+The authenticated `user` object and `childrenList` (active children) flow through the component chain:
 
 ```
 app/(dashboard)/layout.tsx  (Server Component, async)
   → supabase.auth.getUser()
-  → passes `user` prop to:
+  → supabase.from("children").select()  (active children)
+  → passes `user` + `childrenList` props to:
     → Sidebar (Server Component)
       → SidebarContent (Client Component)
+        → CreatePostButton (Client Component)
+          → CreatePostModal (Client Component)
     → SidebarDrawer (Client Component)
       → SidebarContent (Client Component)
 ```
 
 `SidebarContent` derives `name` and `initial` from `user.user_metadata?.name || user.email`.
+`CreatePostModal` uses `childrenList` to populate the recipient selector (real DB data, not mock).
 
 ### Test credentials
 

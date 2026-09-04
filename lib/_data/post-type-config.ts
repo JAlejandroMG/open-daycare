@@ -30,7 +30,7 @@ export const POST_TYPE_CONFIG: Record<PostType, PostTypeConfig> = {
     backgroundColor: "#CCD8F4",
     textColor: "#4E72C8",
   },
-  food: {
+  meal: {
     label: "COMIDA",
     badgeClassName: "bg-[#9A7B1E] text-white",
     dotClassName: "bg-[#9A7B1E]",
@@ -51,7 +51,7 @@ export const POST_TYPE_CONFIG: Record<PostType, PostTypeConfig> = {
     backgroundColor: "#F9D2DE",
     textColor: "#C56486",
   },
-  picture: {
+  photo: {
     label: "FOTO",
     badgeClassName: "bg-[#FBD8CC] text-[#D9684A]",
     dotClassName: "bg-[#D9684A]",

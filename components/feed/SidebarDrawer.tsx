@@ -4,7 +4,19 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { SidebarContent } from "./SidebarContent";
 
-export function SidebarDrawer({ user }: { user: User }) {
+type ChildItem = {
+  id: string;
+  full_name: string;
+  rooms: { name: string }[];
+};
+
+export function SidebarDrawer({
+  user,
+  childrenList,
+}: {
+  user: User;
+  childrenList: ChildItem[];
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -66,7 +78,7 @@ export function SidebarDrawer({ user }: { user: User }) {
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
-            <SidebarContent user={user} />
+            <SidebarContent user={user} childrenList={childrenList} />
           </aside>
         </div>
       ) : null}
