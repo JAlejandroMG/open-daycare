@@ -5,7 +5,7 @@ import { mapDbPostToUiPost } from "@/lib/mappers/post-mapper";
 import { DateSeparator } from "@/components/feed/DateSeparator";
 import { FeedHeader } from "@/components/feed/FeedHeader";
 import { NewPostPrompt } from "@/components/feed/NewPostPrompt";
-import { PostCard } from "@/components/feed/PostCard";
+import { RealtimePostsProvider } from "@/components/feed/RealtimePostsProvider";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -76,11 +76,10 @@ export default async function Home() {
       />
       <NewPostPrompt />
       <DateSeparator label="PUBLICADO HOY" />
-      <div className="flex flex-col gap-4">
-        {mappedPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
-        ))}
-      </div>
+      <RealtimePostsProvider
+        initialPosts={mappedPosts}
+        currentUserId={user.id}
+      />
     </div>
   );
 }
