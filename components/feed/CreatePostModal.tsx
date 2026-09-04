@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { currentUser, posts } from "@/lib/_data/mock-data";
+import { createPost } from "@/app/(dashboard)/actions/posts";
 import { POST_TYPE_CONFIG } from "@/lib/_data/post-type-config";
 import type { PostType } from "@/lib/_data/types";
+import { createClient } from "@/utils/supabase/client";
 
 type ChildItem = {
   id: string;
@@ -22,6 +23,7 @@ type FormErrors = {
   recipient?: string;
   type?: string;
   description?: string;
+  photos?: string;
 };
 
 function getFirstName(name: string): string {
@@ -34,10 +36,14 @@ export function CreatePostModal({
   childrenList,
 }: CreatePostModalProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [recipientKidIds, setRecipientKidIds] = useState<string[]>([]);
   const [type, setType] = useState<PostType | "">("");
   const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isAllRoom = recipientKidIds.includes("all");
 
@@ -72,65 +78,111 @@ export function CreatePostModal({
     []
   );
 
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
+      const remaining = 10 - selectedFiles.length;
+      const newFiles = files.slice(0, remaining);
+
+      if (newFiles.length === 0) return;
+
+      setSelectedFiles((prev) => [...prev, ...newFiles]);
+
+      newFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      setErrors((prev) => ({ ...prev, photos: undefined }));
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+    [selectedFiles.length]
+  );
+
+  const removeFile = useCallback((index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   if (!isOpen) return null;
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     const newErrors: FormErrors = {};
-    if (recipientKidIds.length === 0) newErrors.recipient = "Seleccioná al menos un destinatario";
+    if (recipientKidIds.length === 0)
+      newErrors.recipient = "Seleccioná al menos un destinatario";
     if (!type) newErrors.type = "Seleccioná un tipo";
     if (!description.trim()) newErrors.description = "Escribí una descripción";
+    if (selectedFiles.length > 10)
+      newErrors.photos = "Máximo 10 fotos permitidas";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    const now = new Date();
-    const publishedAt = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    setIsSubmitting(true);
 
-    let childNames: string[];
-    let childInitials: string[];
-    let avatarBackgroundColors: string[];
-    let avatarTextColors: string[];
-    let recipientsList: string[];
+    try {
+      const photoUrls: string[] = [];
 
-    if (isAllRoom) {
-      childNames = ["Anuncio general"];
-      childInitials = ["A"];
-      avatarBackgroundColors = ["bg-[#CCD8F4]"];
-      avatarTextColors = ["text-[#4E72C8]"];
-      recipientsList = ["toda la sala"];
-    } else {
-      const selectedKids = childrenList.filter((k) => recipientKidIds.includes(k.id));
-      childNames = selectedKids.map((k) => getFirstName(k.full_name));
-      childInitials = selectedKids.map((k) => k.full_name.charAt(0).toUpperCase());
-      avatarBackgroundColors = selectedKids.map(() => "bg-[#A9D9E8]");
-      avatarTextColors = selectedKids.map(() => "text-[#1F7A93]");
-      recipientsList = selectedKids.map((k) => `familia de ${getFirstName(k.full_name)}`);
+      if (selectedFiles.length > 0) {
+        const supabase = createClient();
+
+        for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          const fileExt = file.name.split(".").pop();
+          const fileName = `${Date.now()}-${i}.${fileExt}`;
+          const filePath = `posts/${fileName}`;
+
+          const { error: uploadError, data } = await supabase.storage
+            .from("post-photos")
+            .upload(filePath, file);
+
+          if (uploadError) {
+            console.error("Error uploading file:", uploadError);
+            setErrors({ photos: "Error al subir las fotos" });
+            setIsSubmitting(false);
+            return;
+          }
+
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from("post-photos").getPublicUrl(data.path);
+
+          photoUrls.push(publicUrl);
+        }
+      }
+
+      const result = await createPost(
+        recipientKidIds,
+        type,
+        description.trim(),
+        photoUrls
+      );
+
+      if (!result.success) {
+        setErrors({ description: result.error });
+        setIsSubmitting(false);
+        return;
+      }
+
+      router.refresh();
+      onClose();
+      setRecipientKidIds([]);
+      setType("");
+      setDescription("");
+      setSelectedFiles([]);
+      setPreviews([]);
+      setErrors({});
+    } catch (error) {
+      console.error("Error publishing:", error);
+      setErrors({ description: "Error inesperado al publicar" });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const newPost = {
-      id: `post-${Date.now()}`,
-      type: type as PostType,
-      childNames,
-      childInitials,
-      avatarBackgroundColors,
-      avatarTextColors,
-      publishedAt,
-      authorName: currentUser.name,
-      isAuthor: true,
-      recipients: recipientsList,
-      content: description.trim(),
-      photos: [],
-      likesCount: 0,
-      commentsCount: 0,
-    };
-
-    posts.unshift(newPost);
-    router.refresh();
-    alert("Publicación creada");
-    onClose();
-    setRecipientKidIds([]);
-    setType("");
-    setDescription("");
-    setErrors({});
   };
 
   return (
@@ -156,9 +208,10 @@ export function CreatePostModal({
           <button
             type="button"
             onClick={handlePublish}
-            className="text-[15px] font-extrabold text-[#D9583C]"
+            disabled={isSubmitting}
+            className="text-[15px] font-extrabold text-[#D9583C] disabled:opacity-50"
           >
-            Publicar
+            {isSubmitting ? "Publicando…" : "Publicar"}
           </button>
         </div>
         <div className="px-[26px] py-6">
@@ -172,7 +225,8 @@ export function CreatePostModal({
               </p>
             ) : (
               childrenList.map((child) => {
-                const selected = !isAllRoom && recipientKidIds.includes(child.id);
+                const selected =
+                  !isAllRoom && recipientKidIds.includes(child.id);
                 return (
                   <button
                     key={child.id}
@@ -184,9 +238,7 @@ export function CreatePostModal({
                         : "border-[1.5px] border-[#ECE0D0] bg-[#FFFDF9] text-[#6E6359]"
                     }`}
                   >
-                    <span
-                      className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#A9D9E8] font-heading text-[13px] font-semibold text-[#1F7A93]"
-                    >
+                    <span className="flex h-[26px] w-[26px] items-center justify-center rounded-full bg-[#A9D9E8] font-heading text-[13px] font-semibold text-[#1F7A93]">
                       {child.full_name.charAt(0).toUpperCase()}
                     </span>
                     {getFirstName(child.full_name)}
@@ -215,30 +267,33 @@ export function CreatePostModal({
             TIPO
           </div>
           <div className="mb-[22px] flex flex-wrap gap-[9px]">
-            {(Object.entries(POST_TYPE_CONFIG) as [PostType, (typeof POST_TYPE_CONFIG)[PostType]][]).map(
-              ([key, config]) => {
-                const selected = type === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => {
-                      setType(selected ? "" : key);
-                      setErrors((prev) => ({ ...prev, type: undefined }));
-                    }}
-                    className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${
-                      selected ? "ring-2 ring-offset-2 ring-[#3F362E]" : ""
-                    }`}
-                    style={{
-                      backgroundColor: config.backgroundColor,
-                      color: config.textColor,
-                    }}
-                  >
-                    {config.label}
-                  </button>
-                );
-              }
-            )}
+            {(
+              Object.entries(POST_TYPE_CONFIG) as [
+                PostType,
+                (typeof POST_TYPE_CONFIG)[PostType],
+              ][]
+            ).map(([key, config]) => {
+              const selected = type === key;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setType(selected ? "" : key);
+                    setErrors((prev) => ({ ...prev, type: undefined }));
+                  }}
+                  className={`rounded-full px-4 py-2 text-[13.5px] font-extrabold ${
+                    selected ? "ring-2 ring-offset-2 ring-[#3F362E]" : ""
+                  }`}
+                  style={{
+                    backgroundColor: config.backgroundColor,
+                    color: config.textColor,
+                  }}
+                >
+                  {config.label}
+                </button>
+              );
+            })}
           </div>
           {errors.type ? (
             <p className="-mt-[18px] mb-[22px] text-xs text-red-500">
@@ -263,41 +318,72 @@ export function CreatePostModal({
             </p>
           ) : null}
           <div className="mb-[10px] text-xs font-extrabold tracking-[.7px] text-[#94887B]">
-            FOTOS
+            FOTOS{" "}
+            <span className="font-normal text-[#B6A99B]">
+              (máximo 10)
+            </span>
           </div>
-          <div className="flex gap-3">
-            <div className="flex h-24 w-24 items-center justify-center rounded-[14px] border border-[#ECE0D0] bg-[#F4ECE1] text-[#CBB89F]">
-              <svg
-                width="26"
-                height="26"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+          <div className="flex flex-wrap gap-3">
+            {previews.map((preview, index) => (
+              <div key={index} className="relative h-24 w-24">
+                <img
+                  src={preview}
+                  alt={`Preview ${index + 1}`}
+                  className="h-24 w-24 rounded-[14px] object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeFile(index)}
+                  className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#3F362E] text-white"
+                >
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+            {selectedFiles.length < 10 && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]"
               >
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="9" cy="9" r="2" />
-                <path d="m21 15-3.6-3.6a2 2 0 0 0-2.8 0L6 21" />
-              </svg>
-            </div>
-            <div className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-[14px] border-[1.5px] border-dashed border-[#DBCDBA] bg-[#F4ECE1] text-[#B0A290]">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#C5503A"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span className="text-xs">Agregar</span>
-            </div>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#C5503A"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span className="text-xs">Agregar</span>
+              </button>
+            )}
           </div>
+          {errors.photos ? (
+            <p className="mt-2 text-xs text-red-500">{errors.photos}</p>
+          ) : null}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+          />
         </div>
       </div>
     </div>
